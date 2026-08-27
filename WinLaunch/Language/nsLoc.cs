@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Resources;
 using System.Windows.Data;
 using WinLaunch.Properties;
@@ -16,11 +20,14 @@ namespace WinLaunch
 
             ResourceManager rm = new ResourceManager(typeof(Resources));
 
-            CultureInfo[] cultures = CultureInfo.GetCultures(CultureTypes.AllCultures);
-            foreach (CultureInfo culture in cultures)
+            foreach (string name in GetCandidateCultureNames())
             {
+                CultureInfo culture;
+
                 try
                 {
+                    culture = new CultureInfo(name);
+
                     if (culture.Equals(CultureInfo.InvariantCulture)) continue; //do not use "==", won't work
 
                     ResourceSet rs = rm.GetResourceSet(culture, true, false);
@@ -32,7 +39,43 @@ namespace WinLaunch
                     //NOP
                 }
             }
+
+            result.Sort((a, b) => string.CompareOrdinal(a.Name, b.Name));
+
             return result;
+        }
+
+        /// <summary>
+        /// The cultures worth probing for a translation.
+        /// Enumerating CultureInfo.GetCultures instead would miss languages: since .NET 5 that
+        /// list comes from ICU and only reports canonical names such as "zh-Hant-TW", never the
+        /// legacy "zh-TW" that the satellite assemblies are keyed on. Reading the deployed
+        /// satellite directories reports exactly the translations that actually shipped.
+        /// </summary>
+        private static IEnumerable<string> GetCandidateCultureNames()
+        {
+            List<string> names = new List<string>();
+
+            try
+            {
+                Assembly assembly = typeof(Resources).Assembly;
+                string satellite = assembly.GetName().Name + ".resources.dll";
+
+                foreach (string directory in Directory.GetDirectories(AppContext.BaseDirectory))
+                {
+                    if (File.Exists(Path.Combine(directory, satellite)))
+                        names.Add(Path.GetFileName(directory));
+                }
+            }
+            catch
+            {
+                //fall through to the culture list below
+            }
+
+            if (names.Count == 0)
+                names.AddRange(CultureInfo.GetCultures(CultureTypes.AllCultures).Select(culture => culture.Name));
+
+            return names;
         }
 
         private static readonly TranslationSource instance = new TranslationSource();
