@@ -71,7 +71,7 @@
 		<value>添加程序</value>
 	</data>
 	<data name="AddFolder" xml:space="preserve">
-		<value>添加目录</value>
+		<value>添加文件夹</value>
 	</data>
 	<data name="AddLink" xml:space="preserve">
 		<value>添加链接</value>
@@ -80,7 +80,7 @@
 		<value>要启用 Aero WinLaunch 将必须重新启动，这可能需要几秒钟时间。</value>
 	</data>
 	<data name="AllowFreePlacement" xml:space="preserve">
-		<value>允许放置免费物品</value>
+		<value>允许自由摆放项目</value>
 	</data>
 	<data name="AllowFreePlacementInfo" xml:space="preserve">
 		<value>允许将项目放置在网格上的任何位置</value>
@@ -90,6 +90,9 @@
 	</data>
 	<data name="Assistant" xml:space="preserve">
 		<value>助手</value>
+	</data>
+	<data name="AssistantAddedCalendarEvent" xml:space="preserve">
+		<value>已添加日历事件</value>
 	</data>
 	<data name="AssistantClearConversation" xml:space="preserve">
 		<value>清除对话历史记录</value>
@@ -113,10 +116,19 @@
 		<value>请输入您的 Patreon 电子邮件</value>
 	</data>
 	<data name="AssistantExecuteCommands" xml:space="preserve">
-		<value>启用助手命令执行</value>
+		<value>启用助手命令执行（Pro）</value>
 	</data>
 	<data name="AssistantExecutedCommand" xml:space="preserve">
-		<value>执行的命令</value>
+		<value>已执行命令</value>
+	</data>
+	<data name="AssistantExecutePython" xml:space="preserve">
+		<value>启用助手执行 Python</value>
+	</data>
+	<data name="AssistantForgetMemory" xml:space="preserve">
+		<value>忘记记忆</value>
+	</data>
+	<data name="AssistantLaunchedItem" xml:space="preserve">
+		<value>已启动项目</value>
 	</data>
 	<data name="AssistantLogin" xml:space="preserve">
 		<value>请登录</value>
@@ -125,7 +137,7 @@
 		<value>消息 WinLaunch 助手...</value>
 	</data>
 	<data name="AssistantName" xml:space="preserve">
-		<value>Win启动助手</value>
+		<value>WinLaunch 助手</value>
 	</data>
 	<data name="AssistantNoPatron" xml:space="preserve">
 		<value>{0} 不是 WinLaunch Patreon 的成员</value>
@@ -134,10 +146,13 @@
 		<value>重置登录</value>
 	</data>
 	<data name="AssistantSearchedWeb" xml:space="preserve">
-		<value>网上搜了一下</value>
+		<value>已搜索网页</value>
 	</data>
 	<data name="AssistantShowIcon" xml:space="preserve">
 		<value>显示助手图标</value>
+	</data>
+	<data name="AssistantStoreMemory" xml:space="preserve">
+		<value>保存记忆</value>
 	</data>
 	<data name="AssistantTroubleConnecting" xml:space="preserve">
 		<value>连接时出现问题</value>
@@ -260,7 +275,7 @@
 		<value>启用亚克力</value>
 	</data>
 	<data name="EnableAcrylicInfo" xml:space="preserve">
-		<value>启用后将使用 Windows 10 新的丙烯酸模糊</value>
+		<value>启用后将使用 Windows 10 新的亚克力模糊</value>
 	</data>
 	<data name="EnableAero" xml:space="preserve">
 		<value>启用Aero</value>
@@ -289,8 +304,11 @@
 	<data name="EnableTouchscreenInfo" xml:space="preserve">
 		<value>触摸模式允许你按住一个图标3秒后移动它(进入编辑模式)</value>
 	</data>
+	<data name="EnableVoiceActivation" xml:space="preserve">
+		<value>启用通过说出“hey WinLaunch”、“open WinLaunch”或“start WinLaunch”来唤起 WinLaunch</value>
+	</data>
 	<data name="EnableWindowsKey" xml:space="preserve">
-		<value>启用 Windows 密钥激活</value>
+		<value>启用 Windows 键激活</value>
 	</data>
 	<data name="Error" xml:space="preserve">
 		<value>错误</value>
@@ -350,7 +368,7 @@
 		<value>加入我们的 Discord</value>
 	</data>
 	<data name="KeyActivation" xml:space="preserve">
-		<value>密钥激活</value>
+		<value>按键激活</value>
 	</data>
 	<data name="Language" xml:space="preserve">
 		<value>语言</value>
@@ -371,13 +389,13 @@
 		<value>外观</value>
 	</data>
 	<data name="MakePortable" xml:space="preserve">
-		<value>使便携</value>
+		<value>设为便携模式</value>
 	</data>
 	<data name="MakePortableInfo" xml:space="preserve">
 		<value>启用后，WinLaunch 将从安装它的文件夹中的 Data 目录而不是 appdata 加载</value>
 	</data>
 	<data name="MiddleMouseActivation" xml:space="preserve">
-		<value>鼠标中建激活</value>
+		<value>鼠标中键激活</value>
 	</data>
 	<data name="MultiMonitors" xml:space="preserve">
 		<value>多显示器</value>
@@ -386,7 +404,7 @@
 		<value>名称：</value>
 	</data>
 	<data name="Nothing" xml:space="preserve">
-		<value>没有什么</value>
+		<value>无</value>
 	</data>
 	<data name="Open" xml:space="preserve">
 		<value>打开</value>
@@ -482,7 +500,7 @@
 		<value>偏好设置</value>
 	</data>
 	<data name="ShoutoutPatreon" xml:space="preserve">
-		<value>向在 Patreon 上支持 WinLaunch 的人们大喊大叫</value>
+		<value>感谢在 Patreon 上支持 WinLaunch 的各位</value>
 	</data>
 	<data name="ShowExtensionIcon" xml:space="preserve">
 		<value>显示扩展图标</value>
@@ -509,7 +527,7 @@
 		<value>仅对文件夹的内容进行排序</value>
 	</data>
 	<data name="SortFoldersFirst" xml:space="preserve">
-		<value>首先排序文件夹！</value>
+		<value>文件夹优先排序</value>
 	</data>
 	<data name="SortItemsAlphabetically" xml:space="preserve">
 		<value>按字母顺序对项目进行排序</value>
@@ -561,6 +579,9 @@
 	</data>
 	<data name="Version" xml:space="preserve">
 		<value>版本：</value>
+	</data>
+	<data name="VoiceActivation" xml:space="preserve">
+		<value>语音激活</value>
 	</data>
 	<data name="Warning" xml:space="preserve">
 		<value>警告</value>

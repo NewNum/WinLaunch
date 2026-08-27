@@ -47,7 +47,7 @@ WinLaunch 是一款 Windows 平台上的启动器（Launchpad）应用，界面�
 
 **本地化**
 
-内置 20+ 语言资源（`WinLaunch/Properties/Resources.*.resx`），包含简体中文 `zh-CN`、英语、德语、日语、俄语、法语等。
+内置 20+ 语言资源（`WinLaunch/Properties/Resources.*.resx`），包含简体中文 `zh-CN`、繁体中文 `zh-TW`、英语、德语、日语、俄语、法语等。在偏好设置的「通用 → 语言」中切换，即时生效。
 
 ## 技术栈
 

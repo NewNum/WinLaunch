@@ -1,0 +1,589 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="About" xml:space="preserve">
+    <value>關於</value>
+  </data>
+  <data name="Activation" xml:space="preserve">
+    <value>喚起方式</value>
+  </data>
+  <data name="AddDesktopLinks" xml:space="preserve">
+    <value>自動將桌面捷徑新增到 WinLaunch</value>
+  </data>
+  <data name="AddFile" xml:space="preserve">
+    <value>新增檔案</value>
+  </data>
+  <data name="AddFolder" xml:space="preserve">
+    <value>新增資料夾</value>
+  </data>
+  <data name="AddLink" xml:space="preserve">
+    <value>新增連結</value>
+  </data>
+  <data name="AeroSwitch" xml:space="preserve">
+    <value>啟用 Aero 需要重新啟動 WinLaunch，這可能需要幾秒鐘。</value>
+  </data>
+  <data name="AllowFreePlacement" xml:space="preserve">
+    <value>允許自由擺放項目</value>
+  </data>
+  <data name="AllowFreePlacementInfo" xml:space="preserve">
+    <value>允許將項目擺放在格線上的任何位置</value>
+  </data>
+  <data name="Arguments" xml:space="preserve">
+    <value>參數：</value>
+  </data>
+  <data name="Assistant" xml:space="preserve">
+    <value>助理</value>
+  </data>
+  <data name="AssistantAddedCalendarEvent" xml:space="preserve">
+    <value>已新增行事曆活動</value>
+  </data>
+  <data name="AssistantClearConversation" xml:space="preserve">
+    <value>清除對話記錄</value>
+  </data>
+  <data name="AssistantClose" xml:space="preserve">
+    <value>關閉 WinLaunch 助理</value>
+  </data>
+  <data name="AssistantConnecting" xml:space="preserve">
+    <value>連線中...</value>
+  </data>
+  <data name="AssistantEnableTTS" xml:space="preserve">
+    <value>啟用文字轉語音</value>
+  </data>
+  <data name="AssistantEnterNewPassword" xml:space="preserve">
+    <value>已找到帳戶！\r\n請為您的 WinLaunch 助理設定新密碼</value>
+  </data>
+  <data name="AssistantEnterPassword" xml:space="preserve">
+    <value>請輸入密碼</value>
+  </data>
+  <data name="AssistantEnterPatreonEmail" xml:space="preserve">
+    <value>請輸入您的 Patreon 電子郵件</value>
+  </data>
+  <data name="AssistantExecuteCommands" xml:space="preserve">
+    <value>啟用助理執行命令（Pro）</value>
+  </data>
+  <data name="AssistantExecutedCommand" xml:space="preserve">
+    <value>已執行命令</value>
+  </data>
+  <data name="AssistantExecutePython" xml:space="preserve">
+    <value>啟用助理執行 Python</value>
+  </data>
+  <data name="AssistantForgetMemory" xml:space="preserve">
+    <value>忘記記憶</value>
+  </data>
+  <data name="AssistantLaunchedItem" xml:space="preserve">
+    <value>已啟動項目</value>
+  </data>
+  <data name="AssistantLogin" xml:space="preserve">
+    <value>請登入</value>
+  </data>
+  <data name="AssistantMessage" xml:space="preserve">
+    <value>傳訊給 WinLaunch 助理...</value>
+  </data>
+  <data name="AssistantName" xml:space="preserve">
+    <value>WinLaunch 助理</value>
+  </data>
+  <data name="AssistantNoPatron" xml:space="preserve">
+    <value>{0} 不是 WinLaunch Patreon 的成員</value>
+  </data>
+  <data name="AssistantResetLogin" xml:space="preserve">
+    <value>重設登入</value>
+  </data>
+  <data name="AssistantSearchedWeb" xml:space="preserve">
+    <value>已搜尋網路</value>
+  </data>
+  <data name="AssistantShowIcon" xml:space="preserve">
+    <value>顯示助理圖示</value>
+  </data>
+  <data name="AssistantStoreMemory" xml:space="preserve">
+    <value>儲存記憶</value>
+  </data>
+  <data name="AssistantTroubleConnecting" xml:space="preserve">
+    <value>連線發生問題</value>
+  </data>
+  <data name="AssistantUnfollowed" xml:space="preserve">
+    <value>您已不是 WinLaunch Patreon 的成員，\n請加入以使用 WinLaunch 助理</value>
+  </data>
+  <data name="AssistantWelcomeMessage" xml:space="preserve">
+    <value>今天有什麼需要協助的嗎？</value>
+  </data>
+  <data name="AssistantWrongPassword" xml:space="preserve">
+    <value>密碼錯誤</value>
+  </data>
+  <data name="AssistantYou" xml:space="preserve">
+    <value>您</value>
+  </data>
+  <data name="Background" xml:space="preserve">
+    <value>背景</value>
+  </data>
+  <data name="BackgroundBlur" xml:space="preserve">
+    <value>背景模糊</value>
+  </data>
+  <data name="BackgroundTint" xml:space="preserve">
+    <value>背景色調</value>
+  </data>
+  <data name="BackupAndRestore" xml:space="preserve">
+    <value>備份與還原</value>
+  </data>
+  <data name="BackupCreateError" xml:space="preserve">
+    <value>建立備份時發生錯誤</value>
+  </data>
+  <data name="BackupCreateSuccess" xml:space="preserve">
+    <value>已成功建立備份</value>
+  </data>
+  <data name="BackupDeleteFilesManually" xml:space="preserve">
+    <value>部分檔案無法刪除，請手動刪除</value>
+  </data>
+  <data name="BackupRestore" xml:space="preserve">
+    <value>還原備份</value>
+  </data>
+  <data name="BackupRestoreError" xml:space="preserve">
+    <value>從備份還原時發生錯誤</value>
+  </data>
+  <data name="BackupRestoreInfo" xml:space="preserve">
+    <value>從此備份還原將會移除目前的設定，確定要還原嗎？</value>
+  </data>
+  <data name="BlockFullscreen" xml:space="preserve">
+    <value>全螢幕程式執行時停用 WinLaunch</value>
+  </data>
+  <data name="BlockFullscreenInfo" xml:space="preserve">
+    <value>啟用後，偵測到全螢幕程式執行時將停用 WinLaunch，例如遊玩遊戲或觀看影片時。</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="CantBeUndoneWarning" xml:space="preserve">
+    <value>此操作無法復原</value>
+  </data>
+  <data name="CheckForUpdates" xml:space="preserve">
+    <value>檢查更新</value>
+  </data>
+  <data name="CheckForUpdatesFrequently" xml:space="preserve">
+    <value>經常檢查更新</value>
+  </data>
+  <data name="ChooseMonitor" xml:space="preserve">
+    <value>選擇螢幕</value>
+  </data>
+  <data name="ChoosePath" xml:space="preserve">
+    <value>選擇路徑</value>
+  </data>
+  <data name="ClearItems" xml:space="preserve">
+    <value>清除項目</value>
+  </data>
+  <data name="Clicked" xml:space="preserve">
+    <value>單擊</value>
+  </data>
+  <data name="CloseWarning" xml:space="preserve">
+    <value>確定要關閉 WinLaunch 嗎？</value>
+  </data>
+  <data name="Columns" xml:space="preserve">
+    <value>欄</value>
+  </data>
+  <data name="ColumnsAndRows" xml:space="preserve">
+    <value>欄與列</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>確認</value>
+  </data>
+  <data name="Copied" xml:space="preserve">
+    <value>已複製</value>
+  </data>
+  <data name="CreateBackup" xml:space="preserve">
+    <value>建立備份</value>
+  </data>
+  <data name="CreatedBy" xml:space="preserve">
+    <value>作者</value>
+  </data>
+  <data name="CustomThemes" xml:space="preserve">
+    <value>在 Patreon 上支持 WinLaunch，即可使用自訂佈景主題與其他好處</value>
+  </data>
+  <data name="DeleteDesktopLinks" xml:space="preserve">
+    <value>新增後刪除桌面捷徑</value>
+  </data>
+  <data name="WatchForInstalledApps" xml:space="preserve">
+    <value>自動新增新安裝的應用程式</value>
+  </data>
+  <data name="RemoveUninstalledApps" xml:space="preserve">
+    <value>移除已解除安裝的應用程式</value>
+  </data>
+  <data name="DeskModeSwitch" xml:space="preserve">
+    <value>切換桌面模式需要重新啟動 WinLaunch，這可能需要幾秒鐘。</value>
+  </data>
+  <data name="DoubleClicked" xml:space="preserve">
+    <value>雙擊</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>編輯</value>
+  </data>
+  <data name="EnableAcrylic" xml:space="preserve">
+    <value>啟用壓克力效果</value>
+  </data>
+  <data name="EnableAcrylicInfo" xml:space="preserve">
+    <value>啟用後將使用 Windows 10 的壓克力模糊效果</value>
+  </data>
+  <data name="EnableAero" xml:space="preserve">
+    <value>啟用 Aero</value>
+  </data>
+  <data name="EnableAeroInfo" xml:space="preserve">
+    <value>啟用後將使用 Windows Aero 取代桌布</value>
+  </data>
+  <data name="EnableAltDoubleTap" xml:space="preserve">
+    <value>啟用連按兩次 Alt 鍵喚起</value>
+  </data>
+  <data name="EnableCtrlDoubleTap" xml:space="preserve">
+    <value>啟用連按兩次 Ctrl 鍵喚起</value>
+  </data>
+  <data name="EnableGamepadActivation" xml:space="preserve">
+    <value>啟用以遊戲手把的 Start 鍵喚起 WinLaunch</value>
+  </data>
+  <data name="EnableHotCorner" xml:space="preserve">
+    <value>啟用螢幕熱角</value>
+  </data>
+  <data name="EnableHotKey" xml:space="preserve">
+    <value>啟用快速鍵</value>
+  </data>
+  <data name="EnableTouchscreen" xml:space="preserve">
+    <value>啟用觸控模式</value>
+  </data>
+  <data name="EnableTouchscreenInfo" xml:space="preserve">
+    <value>觸控模式下需按住項目 3 秒後才能移動（項目會開始晃動）</value>
+  </data>
+  <data name="EnableVoiceActivation" xml:space="preserve">
+    <value>啟用以語音「hey WinLaunch」、「open WinLaunch」或「start WinLaunch」喚起 WinLaunch</value>
+  </data>
+  <data name="EnableWindowsKey" xml:space="preserve">
+    <value>啟用 Windows 鍵喚起</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>錯誤</value>
+  </data>
+  <data name="FillScreen" xml:space="preserve">
+    <value>填滿整個螢幕</value>
+  </data>
+  <data name="FillScreenInfo" xml:space="preserve">
+    <value>啟用後 WinLaunch 將覆蓋整個螢幕，包含工作列</value>
+  </data>
+  <data name="FolderColumns" xml:space="preserve">
+    <value>資料夾欄數</value>
+  </data>
+  <data name="GamepadActivation" xml:space="preserve">
+    <value>遊戲手把喚起</value>
+  </data>
+  <data name="General" xml:space="preserve">
+    <value>一般</value>
+  </data>
+  <data name="HideWindow" xml:space="preserve">
+    <value>隱藏視窗</value>
+  </data>
+  <data name="HotCornerDelay" xml:space="preserve">
+    <value>延遲：</value>
+  </data>
+  <data name="HotCornersActivation" xml:space="preserve">
+    <value>螢幕熱角喚起</value>
+  </data>
+  <data name="HotKeyActivation" xml:space="preserve">
+    <value>快速鍵喚起</value>
+  </data>
+  <data name="Icons" xml:space="preserve">
+    <value>圖示</value>
+  </data>
+  <data name="IconShadowOpacity" xml:space="preserve">
+    <value>圖示陰影不透明度</value>
+  </data>
+  <data name="IconSize" xml:space="preserve">
+    <value>圖示大小</value>
+  </data>
+  <data name="IconText" xml:space="preserve">
+    <value>圖示文字：</value>
+  </data>
+  <data name="IconTextShadow" xml:space="preserve">
+    <value>圖示文字陰影：</value>
+  </data>
+  <data name="Interface" xml:space="preserve">
+    <value>介面</value>
+  </data>
+  <data name="ItemOptions" xml:space="preserve">
+    <value>項目選項</value>
+  </data>
+  <data name="Items" xml:space="preserve">
+    <value>項目</value>
+  </data>
+  <data name="JoinUsOnDiscord" xml:space="preserve">
+    <value>加入我們的 Discord</value>
+  </data>
+  <data name="KeyActivation" xml:space="preserve">
+    <value>按鍵喚起</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>語言</value>
+  </data>
+  <data name="LanguageInfo" xml:space="preserve">
+    <value>若要更新或提供新的翻譯，請前往</value>
+  </data>
+  <data name="LatestVersion" xml:space="preserve">
+    <value>您使用的已是最新版本</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>載入中...</value>
+  </data>
+  <data name="LoadWallpaper" xml:space="preserve">
+    <value>載入桌布</value>
+  </data>
+  <data name="LookAndFeel" xml:space="preserve">
+    <value>外觀</value>
+  </data>
+  <data name="MakePortable" xml:space="preserve">
+    <value>設為可攜模式</value>
+  </data>
+  <data name="MakePortableInfo" xml:space="preserve">
+    <value>啟用後 WinLaunch 將從安裝資料夾中的 Data 目錄載入，而不是 appdata</value>
+  </data>
+  <data name="MiddleMouseActivation" xml:space="preserve">
+    <value>滑鼠中鍵喚起</value>
+  </data>
+  <data name="MultiMonitors" xml:space="preserve">
+    <value>多螢幕</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>名稱：</value>
+  </data>
+  <data name="Nothing" xml:space="preserve">
+    <value>無</value>
+  </data>
+  <data name="Open" xml:space="preserve">
+    <value>開啟</value>
+  </data>
+  <data name="OpenAsAdmin" xml:space="preserve">
+    <value>以系統管理員身分開啟</value>
+  </data>
+  <data name="OpenFolders" xml:space="preserve">
+    <value>建立資料夾後自動開啟</value>
+  </data>
+  <data name="OpenLocation" xml:space="preserve">
+    <value>開啟檔案位置</value>
+  </data>
+  <data name="OpenOnActiveMonitor" xml:space="preserve">
+    <value>一律在使用中的螢幕開啟 WinLaunch</value>
+  </data>
+  <data name="OpenOnActiveMonitorInfo" xml:space="preserve">
+    <value>啟用後將自動在滑鼠所在的螢幕上喚起 WinLaunch</value>
+  </data>
+  <data name="Options" xml:space="preserve">
+    <value>選項</value>
+  </data>
+  <data name="Path" xml:space="preserve">
+    <value>路徑：</value>
+  </data>
+  <data name="Patrons" xml:space="preserve">
+    <value>贊助者</value>
+  </data>
+  <data name="PinDesktop" xml:space="preserve">
+    <value>將 WinLaunch 釘選到桌面</value>
+  </data>
+  <data name="PinDesktopInfo" xml:space="preserve">
+    <value>啟用後 WinLaunch 將釘選在桌面上並取代桌布</value>
+  </data>
+  <data name="PressAKey" xml:space="preserve">
+    <value>請按一個鍵</value>
+  </data>
+  <data name="Quit" xml:space="preserve">
+    <value>結束</value>
+  </data>
+  <data name="ReallyRefreshInstalledApps" xml:space="preserve">
+    <value>確定要重新掃描所有已安裝的應用程式，並將缺少的加入 WinLaunch 嗎？</value>
+  </data>
+  <data name="RefreshInstalledApps" xml:space="preserve">
+    <value>重新整理已安裝的應用程式</value>
+  </data>
+  <data name="RefreshInstalledAppsResult" xml:space="preserve">
+    <value>已新增 {0} 個應用程式，移除 {1} 個已解除安裝應用程式的項目。</value>
+  </data>
+  <data name="RemoveDuplicates" xml:space="preserve">
+    <value>移除重複的應用程式</value>
+  </data>
+  <data name="ReallyRemoveDuplicates" xml:space="preserve">
+    <value>確定要移除指向同一個應用程式的重複項目嗎？</value>
+  </data>
+  <data name="RemoveDuplicatesResult" xml:space="preserve">
+    <value>已移除 {0} 個重複項目。</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>移除</value>
+  </data>
+  <data name="RemoveFolder" xml:space="preserve">
+    <value>移除此資料夾將一併移除其中的所有項目</value>
+  </data>
+  <data name="RemoveItem" xml:space="preserve">
+    <value>確定要移除這個項目嗎？</value>
+  </data>
+  <data name="RestoreBackup" xml:space="preserve">
+    <value>從備份還原</value>
+  </data>
+  <data name="RestoreIcon" xml:space="preserve">
+    <value>還原圖示</value>
+  </data>
+  <data name="Rows" xml:space="preserve">
+    <value>列</value>
+  </data>
+  <data name="Screen" xml:space="preserve">
+    <value>螢幕</value>
+  </data>
+  <data name="SearchKeywords" xml:space="preserve">
+    <value>別名：</value>
+  </data>
+  <data name="SearchKeywordsInfo" xml:space="preserve">
+    <value>可用於搜尋的關鍵字</value>
+  </data>
+  <data name="SelectBackground" xml:space="preserve">
+    <value>選擇背景圖片</value>
+  </data>
+  <data name="SelectIcon" xml:space="preserve">
+    <value>選擇圖示</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="ShoutoutPatreon" xml:space="preserve">
+    <value>感謝在 Patreon 上支持 WinLaunch 的各位</value>
+  </data>
+  <data name="ShowExtensionIcon" xml:space="preserve">
+    <value>顯示擴充圖示</value>
+  </data>
+  <data name="ShowFolderText" xml:space="preserve">
+    <value>顯示資料夾名稱</value>
+  </data>
+  <data name="ShowItemText" xml:space="preserve">
+    <value>顯示項目名稱</value>
+  </data>
+  <data name="ShowMiniatures" xml:space="preserve">
+    <value>顯示縮圖圖示</value>
+  </data>
+  <data name="ShowPageIndicators" xml:space="preserve">
+    <value>顯示頁面指示器</value>
+  </data>
+  <data name="ShowSearchBar" xml:space="preserve">
+    <value>顯示搜尋列</value>
+  </data>
+  <data name="ShowWelcomeDialog" xml:space="preserve">
+    <value>顯示歡迎對話框</value>
+  </data>
+  <data name="SortFolderContentsOnly" xml:space="preserve">
+    <value>僅排序資料夾內的項目</value>
+  </data>
+  <data name="SortFoldersFirst" xml:space="preserve">
+    <value>資料夾優先排序</value>
+  </data>
+  <data name="SortItemsAlphabetically" xml:space="preserve">
+    <value>依字母順序排序項目</value>
+  </data>
+  <data name="StartWithWindows" xml:space="preserve">
+    <value>開機時啟動</value>
+  </data>
+  <data name="StartWithWindowsInfo" xml:space="preserve">
+    <value>啟用後 WinLaunch 將於開機時自動啟動</value>
+  </data>
+  <data name="Success" xml:space="preserve">
+    <value>成功</value>
+  </data>
+  <data name="SyncWallpaper" xml:space="preserve">
+    <value>同步桌布</value>
+  </data>
+  <data name="SyncWallpaperInfo" xml:space="preserve">
+    <value>啟用後背景將與目前的桌布同步</value>
+  </data>
+  <data name="Themes" xml:space="preserve">
+    <value>佈景主題</value>
+  </data>
+  <data name="TranslatedBy" xml:space="preserve">
+    <value>翻譯：JR</value>
+  </data>
+  <data name="Tutorial" xml:space="preserve">
+    <value>教學</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="UpdateAvailable" xml:space="preserve">
+    <value>有可用的更新</value>
+  </data>
+  <data name="UpdateAvailableInfo" xml:space="preserve">
+    <value>WinLaunch 有新版本可用，要立即更新嗎？</value>
+  </data>
+  <data name="UpdateError" xml:space="preserve">
+    <value>無法下載版本資訊</value>
+  </data>
+  <data name="UpdateSilently" xml:space="preserve">
+    <value>靜默更新</value>
+  </data>
+  <data name="UseCustomBackground" xml:space="preserve">
+    <value>使用自訂背景</value>
+  </data>
+  <data name="UseCustomBackgroundInfo" xml:space="preserve">
+    <value>啟用後將載入自訂的背景圖片</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>版本：</value>
+  </data>
+  <data name="VoiceActivation" xml:space="preserve">
+    <value>語音喚起</value>
+  </data>
+  <data name="Warning" xml:space="preserve">
+    <value>警告</value>
+  </data>
+</root>

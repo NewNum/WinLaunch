@@ -18,7 +18,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <LangVersion>latest</LangVersion>
-    <SatelliteResourceLanguages>bg-BG;da-DK;de-DE;en-US;es-ES;fr-FR;he-IL;hu-HU;id-ID;it-IT;ja-JP;pl-PL;pt-BR;ru-RU;tr-TR;uk-UA;zh-CN</SatelliteResourceLanguages>
+    <SatelliteResourceLanguages>bg-BG;da-DK;de-DE;en-US;es-ES;fr-FR;he-IL;hu-HU;id-ID;it-IT;ja-JP;pl-PL;pt-BR;ru-RU;tr-TR;uk-UA;zh-CN;zh-TW</SatelliteResourceLanguages>
     <NoWarn>$(NoWarn);SYSLIB0014</NoWarn>
   </PropertyGroup>
 
