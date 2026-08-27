@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
@@ -11,157 +12,294 @@ namespace WinLaunch
 {
     partial class MainWindow : Window
     {
-        DesktopFileWatcher desktopWatcher;
+        ShortcutFolderWatcher desktopWatcher;
+        ShortcutFolderWatcher startMenuWatcher;
+
+        private bool appScanRunning = false;
+
+        #region Watchers
 
         private void StartDesktopWatcher()
         {
             StopDesktopWatcher();
 
-            desktopWatcher = new DesktopFileWatcher();
+            desktopWatcher = new ShortcutFolderWatcher(
+                new[]
+                {
+                    Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                    Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory)
+                },
+                false,
+                TimeSpan.FromMilliseconds(400));
+
             desktopWatcher.FilesAdded += desktopWatcher_FilesAdded;
         }
 
         private void StopDesktopWatcher()
         {
-            if (desktopWatcher != null)
-            {
-                desktopWatcher.FilesAdded -= desktopWatcher_FilesAdded;
-                desktopWatcher = null;
-            }
+            if (desktopWatcher == null)
+                return;
+
+            desktopWatcher.FilesAdded -= desktopWatcher_FilesAdded;
+            desktopWatcher.Dispose();
+            desktopWatcher = null;
+        }
+
+        private void StartStartMenuWatcher()
+        {
+            StopStartMenuWatcher();
+
+            //an installer writes a whole program group at once, so give it time to settle
+            startMenuWatcher = new ShortcutFolderWatcher(
+                InstalledAppScanner.GetStartMenuRoots(),
+                true,
+                TimeSpan.FromSeconds(3));
+
+            startMenuWatcher.FilesAdded += startMenuWatcher_FilesAdded;
+        }
+
+        private void StopStartMenuWatcher()
+        {
+            if (startMenuWatcher == null)
+                return;
+
+            startMenuWatcher.FilesAdded -= startMenuWatcher_FilesAdded;
+            startMenuWatcher.Dispose();
+            startMenuWatcher = null;
         }
 
         private void desktopWatcher_FilesAdded(object sender, EventArgsFilesAdded e)
         {
-            SBM.CloseFolderInstant();
-            SBM.EndSearch();
-
-            foreach (var file in e.Files)
-            {
-                //check if the file is already added
-                if (SBM.FindItemsByExactName(Path.GetFileNameWithoutExtension(file)).Count > 0)
-                {
-                    continue;
-                }
-
-                AddFile(file);
-
-                if(Settings.CurrentSettings.DeleteDesktopLinksAfterAdding)
-                {
-                    File.Delete(file);
-                }
-            }
+            AddNewShortcuts(e.Files, Settings.CurrentSettings.DeleteDesktopLinksAfterAdding);
         }
 
-        private void AddDefaultApps()
+        private void startMenuWatcher_FilesAdded(object sender, EventArgsFilesAdded e)
+        {
+            //never delete anything out of the start menu
+            AddNewShortcuts(e.Files, false);
+        }
+
+        /// <summary>
+        /// Adds the shortcuts that do not resolve to an application already on the springboard.
+        /// </summary>
+        private void AddNewShortcuts(List<string> files, bool deleteSourceFiles)
         {
             SBM.CloseFolderInstant();
             SBM.EndSearch();
 
-            string startMenuItems = "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs";
-            string additionalStartMenuItems = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Microsoft\\Windows\\Start Menu\\Programs");
+            HashSet<string> identities = CollectItemIdentities();
+            bool added = false;
 
-            List<string> files = new List<string>();
-
-            if (Directory.Exists(startMenuItems))
-                files.AddRange(Directory.GetFiles(startMenuItems));
-
-            if (Directory.Exists(additionalStartMenuItems))
-                files.AddRange(Directory.GetFiles(additionalStartMenuItems));
-
-            List<string> filesToAdd = new List<string>();
-            List<string> dirsToAdd = new List<string>();
-
-            foreach (var file in files)
+            foreach (string file in files)
             {
-                if (file.EndsWith(".lnk"))
+                string identity = AppIdentity.ForFile(file);
+
+                if (identity == null || !identities.Add(identity))
+                    continue;
+
+                AddFile(file);
+                added = true;
+
+                if (deleteSourceFiles)
                 {
-                    if (SBM.FindItemsByExactName(Path.GetFileNameWithoutExtension(file)).Count == 0)
-                        filesToAdd.Add(file);
+                    try
+                    {
+                        File.Delete(file);
+                    }
+                    catch { }
                 }
             }
 
-            List<string> subDirectories = new List<string>();
+            if (added)
+                TriggerSaveItemsDelayed();
+        }
 
-            if (Directory.Exists(startMenuItems))
-                subDirectories.AddRange(Directory.GetDirectories(startMenuItems));
+        #endregion Watchers
 
-            if (Directory.Exists(additionalStartMenuItems))
-                subDirectories.AddRange(Directory.GetDirectories(additionalStartMenuItems));
+        #region Identity
 
-            foreach (var directory in subDirectories)
+        private IEnumerable<SBItem> EnumerateAllItems()
+        {
+            foreach (SBItem item in SBM.IC.Items.ToList())
             {
-                var directoryFiles = Directory.GetFiles(directory);
+                yield return item;
 
-                //check if there are at least 2 links in there 
-                int numLnk = 0;
-                foreach (var file in directoryFiles)
+                if (item.IsFolder)
                 {
-                    if (file.EndsWith(".lnk"))
-                    {
-                        if (SBM.FindItemsByExactName(Path.GetFileNameWithoutExtension(file)).Count == 0)
-                            numLnk++;
-                    }
+                    foreach (SBItem subItem in item.IC.Items.ToList())
+                        yield return subItem;
                 }
+            }
+        }
 
-                if (numLnk >= 2)
+        private List<AppIdentitySnapshot> SnapshotAllItems()
+        {
+            return EnumerateAllItems().Select(AppIdentitySnapshot.From).ToList();
+        }
+
+        private HashSet<string> CollectItemIdentities()
+        {
+            HashSet<string> identities = new HashSet<string>(StringComparer.Ordinal);
+
+            foreach (AppIdentitySnapshot snapshot in SnapshotAllItems())
+            {
+                string identity = AppIdentity.ForItem(snapshot);
+
+                if (identity != null)
+                    identities.Add(identity);
+            }
+
+            return identities;
+        }
+
+        #endregion Identity
+
+        #region Refresh installed apps
+
+        private void AddDefaultApps()
+        {
+            RefreshInstalledApps(false);
+        }
+
+        /// <summary>
+        /// Rescans the start menu and folds the result into the springboard. The scan itself runs
+        /// on a background thread because resolving thousands of shortcuts is a slow COM operation.
+        /// </summary>
+        public void RefreshInstalledApps(bool reportResult)
+        {
+            if (appScanRunning)
+                return;
+
+            appScanRunning = true;
+
+            SBM.CloseFolderInstant();
+            SBM.EndSearch();
+
+            List<AppIdentitySnapshot> snapshots = SnapshotAllItems();
+
+            bool removeUninstalled = Settings.CurrentSettings.RemoveUninstalledApps;
+
+            Thread scanThread = new Thread(() =>
+            {
+                InstalledAppScanResult scan = null;
+                List<SBItem> uninstalled = new List<SBItem>();
+
+                try
                 {
-                    dirsToAdd.Add(directory);
-                }
-                else
-                {
-                    //not enough items for a folder, add single item instead
-                    foreach (var file in directoryFiles)
+                    //a reinstall must not be judged by what a previous scan resolved
+                    AppIdentity.ClearCache();
+
+                    HashSet<string> identities = new HashSet<string>(StringComparer.Ordinal);
+
+                    foreach (AppIdentitySnapshot snapshot in snapshots)
                     {
-                        if (file.EndsWith(".lnk"))
+                        if (removeUninstalled && AppIdentity.IsTargetMissing(snapshot))
                         {
-                            if (SBM.FindItemsByExactName(Path.GetFileNameWithoutExtension(file)).Count == 0)
-                                filesToAdd.Add(file);
+                            //this entry is about to go, so it must not suppress a working replacement
+                            uninstalled.Add(snapshot.Item);
+                            continue;
                         }
+
+                        string identity = AppIdentity.ForItem(snapshot);
+
+                        if (identity != null)
+                            identities.Add(identity);
                     }
+
+                    scan = InstalledAppScanner.Scan(identities);
                 }
-            }
+                catch (Exception ex)
+                {
+                    CrashReporter.Report(ex);
+                }
 
-            //exclude entries that exist already 
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    int added = 0;
+                    int removed = 0;
 
-            //sort files and directories 
-            filesToAdd.Sort((a, b) =>
-                Path.GetFileNameWithoutExtension(a).CompareTo(Path.GetFileNameWithoutExtension(b))
-            );
+                    try
+                    {
+                        if (uninstalled != null)
+                            removed = RemoveItems(uninstalled);
 
-            dirsToAdd.Sort();
+                        if (scan != null)
+                            added = ApplyScanResult(scan);
+                    }
+                    catch (Exception ex)
+                    {
+                        CrashReporter.Report(ex);
+                    }
+                    finally
+                    {
+                        appScanRunning = false;
+                    }
 
-            foreach (var file in filesToAdd)
+                    if (reportResult)
+                        ReportRefreshResult(added, removed);
+                }));
+            });
+
+            scanThread.IsBackground = true;
+            scanThread.Name = "WinLaunch app scan";
+
+            //the shell COM objects used to resolve shortcuts expect an STA thread
+            scanThread.SetApartmentState(ApartmentState.STA);
+            scanThread.Start();
+        }
+
+        private void ReportRefreshResult(int added, int removed)
+        {
+            string message = string.Format(
+                TranslationSource.Instance["RefreshInstalledAppsResult"],
+                added,
+                removed);
+
+            MessageBox.Show(message, TranslationSource.Instance["RefreshInstalledApps"]);
+        }
+
+        private int ApplyScanResult(InstalledAppScanResult scan)
+        {
+            int added = 0;
+
+            foreach (string file in scan.LooseFiles)
             {
                 AddFile(file);
+                added++;
             }
 
-            foreach (var directory in dirsToAdd)
+            foreach (ScannedAppFolder scannedFolder in scan.Folders)
             {
-                var directoryFiles = Directory.GetFiles(directory);
+                SBItem folder = new SBItem(scannedFolder.Name, "", "", "Folder", null, "", SBItem.FolderIcon);
+                folder.IsFolder = true;
 
-                //create a folder and add all items
-                SBItem Folder = new SBItem(Path.GetFileName(directory), "", "", "Folder", null, "", SBItem.FolderIcon);
-                Folder.IsFolder = true;
+                int gridIndex = 0;
 
-                int GridIndex = 0;
-                foreach (var file in directoryFiles)
+                foreach (string file in scannedFolder.Files)
                 {
-                    if (file.EndsWith(".lnk"))
-                    {
-                        var item = PrepareFile(file);
+                    SBItem item = PrepareFile(file);
 
-                        item.Page = 0;
-                        item.GridIndex = GridIndex;
+                    if (item == null)
+                        continue;
 
-                        Folder.IC.Items.Add(item);
+                    item.Page = 0;
+                    item.GridIndex = gridIndex;
 
-                        GridIndex++;
-                    }
+                    folder.IC.Items.Add(item);
+
+                    gridIndex++;
+                    added++;
                 }
 
-                SBM.AddItem(Folder);
-                Folder.UpdateFolderIcon(true);
+                if (folder.IC.Items.Count == 0)
+                    continue;
+
+                SBM.AddItem(folder);
+                folder.UpdateFolderIcon(true);
             }
+
+            if (added == 0)
+                return 0;
 
             TriggerSaveItemsDelayed();
 
@@ -169,7 +307,105 @@ namespace WinLaunch
             {
                 SortItemsAlphabetically();
             }
+
+            return added;
         }
+
+        #endregion Refresh installed apps
+
+        #region Duplicate removal
+
+        /// <summary>
+        /// Drops entries that resolve to an application another entry already covers,
+        /// keeping whichever one comes first in the current layout.
+        /// </summary>
+        public int RemoveDuplicateItems()
+        {
+            SBM.CloseFolderInstant();
+            SBM.EndSearch();
+
+            HashSet<string> seen = new HashSet<string>(StringComparer.Ordinal);
+            List<SBItem> duplicates = new List<SBItem>();
+
+            foreach (AppIdentitySnapshot snapshot in SnapshotAllItems())
+            {
+                string identity = AppIdentity.ForItem(snapshot);
+
+                if (identity == null)
+                    continue;
+
+                if (!seen.Add(identity))
+                    duplicates.Add(snapshot.Item);
+            }
+
+            return RemoveItems(duplicates);
+        }
+
+        /// <summary>
+        /// Bulk removal that also works for entries inside closed folders, which the
+        /// interactive remove path cannot handle because it operates on the open folder.
+        /// </summary>
+        private int RemoveItems(ICollection<SBItem> itemsToRemove)
+        {
+            if (itemsToRemove == null || itemsToRemove.Count == 0)
+                return 0;
+
+            SBM.CloseFolderInstant();
+
+            HashSet<SBItem> removeSet = new HashSet<SBItem>(itemsToRemove);
+            List<SBItem> touchedFolders = new List<SBItem>();
+
+            //folder contents first, a folder may end up empty as a result
+            foreach (SBItem folder in SBM.IC.Items.Where(item => item.IsFolder).ToList())
+            {
+                List<SBItem> children = folder.IC.Items.Where(removeSet.Contains).ToList();
+
+                if (children.Count == 0)
+                    continue;
+
+                foreach (SBItem child in children)
+                {
+                    folder.IC.Items.Remove(child);
+
+                    if (SBM.container.Contains(child.ContentRef))
+                        SBM.container.Remove(child.ContentRef);
+                }
+
+                touchedFolders.Add(folder);
+            }
+
+            foreach (SBItem item in SBM.IC.Items.Where(removeSet.Contains).ToList())
+                SBM.RemoveItemFromSB(item);
+
+            foreach (SBItem folder in touchedFolders)
+            {
+                if (folder.IC.Items.Count == 0)
+                {
+                    SBM.RemoveItemFromSB(folder);
+                    continue;
+                }
+
+                int gridIndex = 0;
+
+                foreach (SBItem child in folder.IC.Items)
+                {
+                    child.GridIndex = gridIndex;
+                    child.Page = 0;
+
+                    gridIndex++;
+                }
+
+                folder.UpdateFolderIcon(true);
+            }
+
+            SBM.SP.TotalPages = SBM.GM.GetUsedPages();
+
+            TriggerSaveItemsDelayed();
+
+            return itemsToRemove.Count;
+        }
+
+        #endregion Duplicate removal
 
         public void SortItemsAlphabetically()
         {

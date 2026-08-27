@@ -315,6 +315,12 @@
   <data name="DeleteDesktopLinks" xml:space="preserve">
     <value>Delete desktop links after adding them</value>
   </data>
+  <data name="WatchForInstalledApps" xml:space="preserve">
+    <value>Add newly installed apps automatically</value>
+  </data>
+  <data name="RemoveUninstalledApps" xml:space="preserve">
+    <value>Remove apps that have been uninstalled</value>
+  </data>
   <data name="DeskModeSwitch" xml:space="preserve">
     <value>To toggle DeskMode WinLaunch will have to be restarted, this might take a few seconds.</value>
   </data>
@@ -503,6 +509,18 @@
   </data>
   <data name="RefreshInstalledApps" xml:space="preserve">
     <value>Refresh installed apps</value>
+  </data>
+  <data name="RefreshInstalledAppsResult" xml:space="preserve">
+    <value>{0} app(s) added, {1} entr(y/ies) of uninstalled apps removed.</value>
+  </data>
+  <data name="RemoveDuplicates" xml:space="preserve">
+    <value>Remove duplicate apps</value>
+  </data>
+  <data name="ReallyRemoveDuplicates" xml:space="preserve">
+    <value>Do you really want to remove entries that point to an app another entry already covers?</value>
+  </data>
+  <data name="RemoveDuplicatesResult" xml:space="preserve">
+    <value>{0} duplicate entr(y/ies) removed.</value>
   </data>
   <data name="Remove" xml:space="preserve">
     <value>Remove</value>

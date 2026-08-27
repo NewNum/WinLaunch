@@ -108,8 +108,20 @@ namespace WinLaunch
         {
             if (MessageBox.Show(TranslationSource.Instance["ReallyRefreshInstalledApps"], TranslationSource.Instance["RefreshInstalledApps"], MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
-                AddDefaultApps();
+                RefreshInstalledApps(true);
             }
+        }
+
+        private void miRemoveDuplicates_Clicked(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show(TranslationSource.Instance["ReallyRemoveDuplicates"], TranslationSource.Instance["RemoveDuplicates"], MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                return;
+
+            int removed = RemoveDuplicateItems();
+
+            MessageBox.Show(
+                string.Format(TranslationSource.Instance["RemoveDuplicatesResult"], removed),
+                TranslationSource.Instance["RemoveDuplicates"]);
         }
 
         private void miAddFile_Clicked(object sender, RoutedEventArgs e)
@@ -392,6 +404,11 @@ namespace WinLaunch
                             //new install
                             //add default apps
                             AddDefaultApps();
+                        }
+                        else if (Settings.CurrentSettings.WatchForInstalledApps)
+                        {
+                            //pick up anything installed or uninstalled while WinLaunch was not running
+                            RefreshInstalledApps(false);
                         }
 
                         //Init Assistant after loading items because it needs to build item grammar

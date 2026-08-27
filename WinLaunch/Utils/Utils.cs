@@ -317,6 +317,37 @@ namespace WinLaunch
             return null;
         }
 
+        /// <summary>
+        /// Reads target path and arguments in a single COM round trip.
+        /// Shell.Application resolves advertised (MSI) shortcuts that WScript.Shell reports empty,
+        /// so it is used as a fallback for the target.
+        /// </summary>
+        public static void GetShortcutTargetAndArguments(string shortcutFilename, out string target, out string arguments)
+        {
+            target = null;
+            arguments = null;
+
+            try
+            {
+                dynamic shell = ComUtils.CreateInstance("WScript.Shell");
+
+                if (shell != null)
+                {
+                    dynamic lnk = shell.CreateShortcut(shortcutFilename);
+
+                    if (lnk != null)
+                    {
+                        target = lnk.TargetPath as string;
+                        arguments = lnk.Arguments as string;
+                    }
+                }
+            }
+            catch { }
+
+            if (string.IsNullOrEmpty(target))
+                target = GetShortcutTargetFile(shortcutFilename);
+        }
+
         public static string GetShortcutWorkingDirectory(string shortcutFilename)
         {
             try

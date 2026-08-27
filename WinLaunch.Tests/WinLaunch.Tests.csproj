@@ -14,6 +14,7 @@
     rather than referenced so the test run does not have to pull in the whole UI.
   -->
   <ItemGroup>
+    <Compile Include="..\WinLaunch\Utils\AppIdentityKey.cs" Link="Linked\AppIdentityKey.cs" />
     <Compile Include="..\WinLaunch\Utils\AtomicFile.cs" Link="Linked\AtomicFile.cs" />
     <Compile Include="..\WinLaunch\Utils\CredentialProtector.cs" Link="Linked\CredentialProtector.cs" />
   </ItemGroup>

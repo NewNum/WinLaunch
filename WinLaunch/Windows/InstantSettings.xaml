@@ -328,9 +328,20 @@
                                     IsChecked="{Binding settings.WatchForDesktopLinks}" />
 
                                 <CheckBox x:Name="cbDeleteDesktopLinksAutomatically"
+                                    Margin="0,0,0,10"
                                     Content="{my:Loc DeleteDesktopLinks}"
                                     IsChecked="{Binding settings.DeleteDesktopLinksAfterAdding}"
                                     IsEnabled="{Binding ElementName=cbAddDesktopLinksAutomatically, Path=IsChecked}" />
+
+                                <CheckBox x:Name="cbWatchForInstalledApps"
+                                    Margin="0,0,0,10"
+                                    Content="{my:Loc WatchForInstalledApps}"
+                                    IsChecked="{Binding settings.WatchForInstalledApps}" />
+
+                                <CheckBox x:Name="cbRemoveUninstalledApps"
+                                    Content="{my:Loc RemoveUninstalledApps}"
+                                    IsChecked="{Binding settings.RemoveUninstalledApps}"
+                                    IsEnabled="{Binding ElementName=cbWatchForInstalledApps, Path=IsChecked}" />
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>

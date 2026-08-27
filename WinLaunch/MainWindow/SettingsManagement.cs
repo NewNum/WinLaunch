@@ -70,6 +70,7 @@ namespace WinLaunch
                 UpdateMiddleMouseButtonActivator();
 
                 UpdateDesktopWatcher();
+                UpdateStartMenuWatcher();
 
                 //update bindings
                 settings = Settings.CurrentSettings;
@@ -91,6 +92,18 @@ namespace WinLaunch
             else
             {
                 StopDesktopWatcher();
+            }
+        }
+
+        private void UpdateStartMenuWatcher()
+        {
+            if (Settings.CurrentSettings.WatchForInstalledApps)
+            {
+                StartStartMenuWatcher();
+            }
+            else
+            {
+                StopStartMenuWatcher();
             }
         }
 
@@ -119,6 +132,7 @@ namespace WinLaunch
             UpdateGridSettings();
 
             UpdateDesktopWatcher();
+            UpdateStartMenuWatcher();
 
             //update bindings
             settings = Settings.CurrentSettings;

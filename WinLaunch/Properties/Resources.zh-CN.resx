@@ -241,6 +241,12 @@
 	<data name="DeleteDesktopLinks" xml:space="preserve">
 		<value>添加桌面链接后删除它们</value>
 	</data>
+	<data name="WatchForInstalledApps" xml:space="preserve">
+		<value>自动添加新安装的应用程序</value>
+	</data>
+	<data name="RemoveUninstalledApps" xml:space="preserve">
+		<value>移除已卸载的应用程序</value>
+	</data>
 	<data name="DeskModeSwitch" xml:space="preserve">
 		<value>要切换 DeskMode WinLaunch 将必须重新启动，这可能需要几秒钟时间。 </value>
 	</data>
@@ -426,6 +432,18 @@
 	</data>
 	<data name="RefreshInstalledApps" xml:space="preserve">
 		<value>刷新已安装的应用程序</value>
+	</data>
+	<data name="RefreshInstalledAppsResult" xml:space="preserve">
+		<value>已添加 {0} 个应用程序，移除了 {1} 个已卸载应用程序的条目。</value>
+	</data>
+	<data name="RemoveDuplicates" xml:space="preserve">
+		<value>移除重复的应用程序</value>
+	</data>
+	<data name="ReallyRemoveDuplicates" xml:space="preserve">
+		<value>您确实想要移除指向同一个应用程序的重复条目吗？</value>
+	</data>
+	<data name="RemoveDuplicatesResult" xml:space="preserve">
+		<value>已移除 {0} 个重复条目。</value>
 	</data>
 	<data name="Remove" xml:space="preserve">
 		<value>移除</value>

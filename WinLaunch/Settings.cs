@@ -24,6 +24,8 @@ namespace WinLaunch
 
         public bool WatchForDesktopLinks { get; set; }
         public bool DeleteDesktopLinksAfterAdding { get; set; }
+        public bool WatchForInstalledApps { get; set; }
+        public bool RemoveUninstalledApps { get; set; }
 
         /// <summary>
         /// Assistant Settings
@@ -171,6 +173,8 @@ namespace WinLaunch
 
             WatchForDesktopLinks = true;
             DeleteDesktopLinksAfterAdding = false;
+            WatchForInstalledApps = true;
+            RemoveUninstalledApps = true;
 
             IconSize = 1.4;
             ShowItemIconText = true;
