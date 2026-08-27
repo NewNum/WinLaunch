@@ -427,7 +427,7 @@ namespace WinLaunch
             mainWindow.SBM.UpdateIcons();
         }
 
-        private void UpdateIconColors(object sender, RoutedPropertyChangedEventArgs<Color> e)
+        private void UpdateIconColors(object sender, RoutedPropertyChangedEventArgs<Color?> e)
         {
             //update ui
             mainWindow.SBM.UpdateIcons();

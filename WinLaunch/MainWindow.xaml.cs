@@ -189,7 +189,10 @@ namespace WinLaunch
         {
             CrashReporter.Report(e.Exception);
 
-            MessageBox.Show("WinLaunch just crashed!\nplease submit a bug report to winlaunch.official@gmail.com\nerror: " + e.Exception.Message);
+            string logPath = CrashReporter.WriteLocalLog(e.Exception);
+
+            MessageBox.Show("WinLaunch just crashed!\nplease submit a bug report to winlaunch.official@gmail.com\nerror: " + e.Exception.Message +
+                (logPath == null ? "" : "\n\ndetails written to: " + logPath));
             Environment.Exit(1);
         }
 

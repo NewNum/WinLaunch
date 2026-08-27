@@ -49,25 +49,39 @@ WinLaunch 是一款 Windows 平台上的启动器（Launchpad）应用，界面�
 
 ## 技术栈
 
-- C# / WPF，.NET Framework 4.8
-- Visual Studio 解决方案（`WinLaunch.sln`），NuGet 使用 `packages.config`
-- 主要依赖：Newtonsoft.Json、System.Text.Json、SocketIOClient、MdXaml、AvalonEdit、Extended.Wpf.Toolkit、Microsoft.Xaml.Behaviors.Wpf
-- 原生互操作：`HookWindowsKey.dll`（Win 键钩子）、`XInputInterface.dll` / `XInputDotNetPure.dll`（手柄）
+- C# / WPF，.NET 10（`net10.0-windows`，x64）
+- SDK 风格项目，NuGet 使用 `PackageReference`
+- 主要依赖：Newtonsoft.Json、SocketIOClient、MdXaml、AvalonEdit、Extended.Wpf.Toolkit、Microsoft.Xaml.Behaviors.Wpf、System.Speech
+- 原生互操作：`HookWindowsKey.dll`（Win 键钩子）、`XInputInterface.dll` / `XInputDotNetPure.dll`（手柄）；快捷方式读写通过后期绑定调用 `WScript.Shell` 与 `Shell.Application`
+
+上游原版基于 .NET Framework 4.8，本仓库已迁移到 .NET 10，详见 [迁移说明](#从-net-framework-48-迁移)。
 
 ## 构建
 
-需要 Visual Studio 2019 或更高版本，并安装 .NET Framework 4.8 开发包。
+需要 [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)。不需要 Visual Studio，也不需要 .NET Framework 开发包。
 
 ```powershell
 git clone <本仓库地址>
 cd WinLaunch
-nuget restore WinLaunch.sln
-msbuild WinLaunch.sln /p:Configuration=Release
+dotnet build -c Release
 ```
 
-也可直接用 Visual Studio 打开 `WinLaunch.sln` 后生成运行。生成产物为 `WinLaunch\bin\Release\WinLaunch.exe`。
+生成产物为 `WinLaunch\bin\Release\net10.0-windows\win-x64\WinLaunch.exe`，运行需要 .NET 10 桌面运行时。
 
 若要以便携方式运行，在可执行文件同级目录创建 `Data` 文件夹即可。
+
+## 从 .NET Framework 4.8 迁移
+
+相对上游，本仓库做了以下改动：
+
+- 项目文件改为 SDK 风格，`packages.config` 换成 `PackageReference`，目标框架 `net10.0-windows`，平台固定 x64（两个原生 DLL 均为 x64）
+- 移除了 `IWshRuntimeLibrary` 与 `Shell32` 的 tlbimp COM 引用，改为 `ComUtils.CreateInstance` 后期绑定。COM 引用需要 .NET Framework 版 MSBuild，去掉后 `dotnet build` 可直接使用
+- `HookWindowsKey.dll` 和 `XInputInterface.dll` 此前未在项目文件中声明，从源码构建时不会复制到输出目录，程序一启动就会因 `DllNotFoundException` 崩溃；现已声明为 `Content` 自动复制
+- 依赖升级：AvalonEdit、MdXaml、Microsoft.Xaml.Behaviors.Wpf、Newtonsoft.Json、SocketIOClient 升到当前版本；`System.Text.Json` 7.0.3 存在已知高危漏洞（[GHSA-hh2w-p6rv-4g7w](https://github.com/advisories/GHSA-hh2w-p6rv-4g7w)），已随传递依赖一并解决
+- `System.Buffers`、`System.Memory`、`System.ValueTuple` 等一批垫片包已内置于 .NET 10，全部移除；签入仓库的 `WPFToolkit.Extended.dll` 与已无用的 `app.config`、`Properties/Settings.settings` 一并删除
+- Extended.Wpf.Toolkit 固定在 3.8.2——4.0 起改用仅限非商用的 Xceed Community License，与本项目的 MIT 许可证不兼容
+- 代码适配：`RegistryHive.DynData`（Win9x 遗留）在现代 .NET 中已移除；Xceed `ColorPicker` 的 `SelectedColor` 改为可空类型
+- 崩溃时除了上报远端，现在还会把完整异常链写入配置目录下的 `crash.log`
 
 ## 目录结构
 
@@ -95,6 +109,7 @@ WinLaunch/
 | 设置 | `%AppData%\WinLaunch\Settings.xml` | `Data\Settings.xml` |
 | 主题 | `%AppData%\WinLaunch\CurrentTheme` | `Data\CurrentTheme` |
 | 图标 / 快捷方式缓存 | `%AppData%\WinLaunch\IconCache`、`LinkCache` | `Data\IconCache`、`Data\LinkCache` |
+| 崩溃日志 | `%AppData%\WinLaunch\crash.log` | `Data\crash.log` |
 
 ## 许可证
 

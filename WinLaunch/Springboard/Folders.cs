@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Windows;
-using Xceed.Wpf.Toolkit.Primitives;
 
 namespace WinLaunch
 {

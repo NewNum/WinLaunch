@@ -1,6 +1,4 @@
-﻿using IWshRuntimeLibrary;
-using Microsoft.Win32;
-using Shell32;
+﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -295,18 +293,21 @@ namespace WinLaunch
                 string pathOnly = System.IO.Path.GetDirectoryName(shortcutFilename);
                 string filenameOnly = System.IO.Path.GetFileName(shortcutFilename);
 
-                Shell shell = new Shell();
-                Shell32.Folder folder = shell.NameSpace(pathOnly);
+                dynamic shell = ComUtils.CreateInstance("Shell.Application");
+                if (shell == null)
+                    return null;
+
+                dynamic folder = shell.NameSpace(pathOnly);
 
                 if (folder == null)
                 {
                     return null;
                 }
 
-                FolderItem folderItem = folder.ParseName(filenameOnly);
+                dynamic folderItem = folder.ParseName(filenameOnly);
                 if (folderItem != null)
                 {
-                    Shell32.ShellLinkObject link = (Shell32.ShellLinkObject)folderItem.GetLink;
+                    dynamic link = folderItem.GetLink;
 
                     return link.Path;
                 }
@@ -320,8 +321,11 @@ namespace WinLaunch
         {
             try
             {
-                IWshShell shell = new WshShell();
-                var lnk = shell.CreateShortcut(shortcutFilename) as IWshShortcut;
+                dynamic shell = ComUtils.CreateInstance("WScript.Shell");
+                if (shell == null)
+                    return null;
+
+                dynamic lnk = shell.CreateShortcut(shortcutFilename);
                 if (lnk != null)
                 {
                     return lnk.WorkingDirectory;
@@ -887,8 +891,11 @@ namespace WinLaunch
         {
             string shortcutAddress = Path.Combine(directory, Path.GetFileNameWithoutExtension(file) + ".lnk");
 
-            WshShell shell = new WshShell();
-            IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
+            dynamic shell = ComUtils.CreateInstance("WScript.Shell");
+            if (shell == null)
+                return;
+
+            dynamic shortcut = shell.CreateShortcut(shortcutAddress);
 
             shortcut.TargetPath = file;
             shortcut.Save();
@@ -1049,6 +1056,27 @@ namespace WinLaunch
     public static class CrashReporter
     {
         public static bool Enabled = true;
+
+        /// <summary>
+        /// Writes the full exception chain next to the settings so crashes stay diagnosable
+        /// even when the remote report cannot be delivered. Returns the log path, or null on failure.
+        /// </summary>
+        public static string WriteLocalLog(Exception ex)
+        {
+            try
+            {
+                string path = Path.Combine(Path.GetDirectoryName(PortabilityManager.SettingsPath), "crash.log");
+
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+                File.AppendAllText(path, DateTime.Now.ToString("s") + Environment.NewLine + ex.ToString() + Environment.NewLine + Environment.NewLine);
+
+                return path;
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
         public static void Report(object ex,
                     [CallerMemberName] string sourceMemberName = "",
