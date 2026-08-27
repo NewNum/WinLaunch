@@ -61,12 +61,12 @@ WinLaunch 是一款 Windows 平台上的启动器（Launchpad）应用，界面�
 需要 [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)。不需要 Visual Studio，也不需要 .NET Framework 开发包。
 
 ```powershell
-git clone <本仓库地址>
+git clone https://github.com/NewNum/WinLaunch.git
 cd WinLaunch
 dotnet build -c Release
 ```
 
-生成产物为 `WinLaunch\bin\Release\net10.0-windows\win-x64\WinLaunch.exe`，运行需要 .NET 10 桌面运行时。
+生成产物为 `WinLaunch\bin\Release\net10.0-windows\WinLaunch.exe`，运行需要 [.NET 10 桌面运行时](https://dotnet.microsoft.com/download/dotnet/10.0)。
 
 若要以便携方式运行，在可执行文件同级目录创建 `Data` 文件夹即可。
 
