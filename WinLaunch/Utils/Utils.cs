@@ -951,9 +951,8 @@ namespace WinLaunch
 
         public static string Sha256(string input)
         {
-            System.Security.Cryptography.SHA256Managed crypt = new System.Security.Cryptography.SHA256Managed();
             System.Text.StringBuilder hash = new System.Text.StringBuilder();
-            byte[] crypto = crypt.ComputeHash(System.Text.Encoding.UTF8.GetBytes(input), 0, System.Text.Encoding.UTF8.GetByteCount(input));
+            byte[] crypto = System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(input));
             foreach (byte theByte in crypto)
             {
                 hash.Append(theByte.ToString("x2"));

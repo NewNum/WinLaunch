@@ -12,6 +12,7 @@ namespace WinLaunch
     partial class MainWindow : Window
     {
         Thread gamepadInputThread;
+        CancellationTokenSource gamepadInputCancellation;
         float gamepadThreshold = 0.9f;
 
         class GamePadInputState
@@ -59,8 +60,6 @@ namespace WinLaunch
 
         public void InitGamepadInput()
         {
-            gamepadInputThread = new Thread(new ThreadStart(GamepadLoop));
-
             inputStates = new Dictionary<PlayerIndex, GamePadInputState>();
             inputStates[PlayerIndex.One] = new GamePadInputState();
             inputStates[PlayerIndex.Two] = new GamePadInputState();
@@ -70,12 +69,29 @@ namespace WinLaunch
 
         public void StartGamepadInput()
         {
-            gamepadInputThread.Start();
+            StopGamepadInput();
+
+            gamepadInputCancellation = new CancellationTokenSource();
+
+            gamepadInputThread = new Thread(new ParameterizedThreadStart(GamepadLoop));
+            gamepadInputThread.IsBackground = true;
+            gamepadInputThread.Start(gamepadInputCancellation.Token);
         }
 
         public void StopGamepadInput()
         {
-            gamepadInputThread.Abort();
+            if (gamepadInputCancellation == null)
+                return;
+
+            gamepadInputCancellation.Cancel();
+
+            //the loop wakes up every 20ms, so this returns quickly
+            if (gamepadInputThread != null)
+                gamepadInputThread.Join(TimeSpan.FromSeconds(1));
+
+            gamepadInputCancellation.Dispose();
+            gamepadInputCancellation = null;
+            gamepadInputThread = null;
         }
 
         private void ProcessInputForPlayer(PlayerIndex index)
@@ -151,16 +167,18 @@ namespace WinLaunch
             }
         }
 
-        private void GamepadLoop()
+        private void GamepadLoop(object state)
         {
-            while (true)
+            CancellationToken token = (CancellationToken)state;
+
+            while (!token.IsCancellationRequested)
             {
                 ProcessInputForPlayer(PlayerIndex.One);
                 ProcessInputForPlayer(PlayerIndex.Two);
                 ProcessInputForPlayer(PlayerIndex.Three);
                 ProcessInputForPlayer(PlayerIndex.Four);
 
-                Thread.Sleep(20);
+                token.WaitHandle.WaitOne(20);
             }
         }
 

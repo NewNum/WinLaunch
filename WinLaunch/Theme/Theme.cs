@@ -296,14 +296,14 @@ namespace WinLaunch
                 if (!System.IO.Directory.Exists(PortabilityManager.ThemePath))
                     System.IO.Directory.CreateDirectory(PortabilityManager.ThemePath);
 
-                using (FileStream fs = new FileStream(PortabilityManager.ThemePath + "/theme.xml", FileMode.Create))
+                AtomicFile.Write(PortabilityManager.ThemePath + "/theme.xml", fs =>
                 {
                     using (XmlWriter write = XmlWriter.Create(fs))
                     {
                         XmlSerializer ser = new XmlSerializer(typeof(Theme));
                         ser.Serialize(write, theme);
                     }
-                }
+                });
 
                 return true;
             }

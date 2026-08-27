@@ -41,7 +41,7 @@ WinLaunch 是一款 Windows 平台上的启动器（Launchpad）应用，界面�
 - `memory`：长期记忆条目
 - Python 脚本执行（`ExecuteAssistantPython` 开关）
 
-服务端地址与加密密钥配置在 `WinLaunch/Assistant/AssistantConfig.cs`，默认指向 `http://localhost:3001`。
+服务端地址配置在 `WinLaunch/Assistant/AssistantConfig.cs`，默认指向 `http://localhost:3001`。助手账号密码经 DPAPI 加密后保存，密文与当前 Windows 用户绑定。
 
 **本地化**
 
@@ -70,6 +70,12 @@ dotnet build -c Release
 
 若要以便携方式运行，在可执行文件同级目录创建 `Data` 文件夹即可。
 
+运行单元测试：
+
+```powershell
+dotnet test WinLaunch.Tests\WinLaunch.Tests.csproj
+```
+
 ## 从 .NET Framework 4.8 迁移
 
 相对上游，本仓库做了以下改动：
@@ -82,6 +88,13 @@ dotnet build -c Release
 - Extended.Wpf.Toolkit 固定在 3.8.2——4.0 起改用仅限非商用的 Xceed Community License，与本项目的 MIT 许可证不兼容
 - 代码适配：`RegistryHive.DynData`（Win9x 遗留）在现代 .NET 中已移除；Xceed `ColorPicker` 的 `SelectedColor` 改为可空类型
 - 崩溃时除了上报远端，现在还会把完整异常链写入配置目录下的 `crash.log`
+
+## 迁移后的稳定性与安全修复
+
+- **`Thread.Abort` 全部改为协作式取消。** 上游有 10 处用 `Thread.Abort` 停止后台线程，该 API 在 .NET Core 之后会直接抛 `PlatformNotSupportedException`。其中桌面模式的窗口保活线程每次重新定位窗口都会走到，属于必然触发的崩溃。现改为 `CancellationTokenSource` + `Join`；鼠标钩子线程改为向其消息泵投递 `WM_QUIT` 后正常退出
+- **配置与图标数据改为原子写入。** 此前直接以 `FileMode.Create` 覆盖原文件，写入过程中崩溃或断电会留下被截断的 `Settings.xml` / `Items.xml`，导致配置丢失。现统一经 `AtomicFile`：先写临时文件并 flush 到磁盘，再用 `File.Replace` 替换
+- **助手密码改用 DPAPI 保护。** 上游用硬编码在源码里的共享 AES 密钥加密密码，等同于明文存储。现改为 DPAPI（`DataProtectionScope.CurrentUser`），密文离开当前用户即无法解密；旧格式凭据会在下次登录时自动读出并迁移，无需重新输入密码
+- 新增 `WinLaunch.Tests` 单元测试项目与 GitHub Actions 构建流水线
 
 ## 目录结构
 

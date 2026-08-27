@@ -68,17 +68,29 @@ namespace WinLaunch
 
         private void Begin()
         {
-            if (CheckPositionThread != null)
-                CheckPositionThread.Abort();
+            Stop();
 
-            CheckPositionThread = new Thread(new ThreadStart(CheckPositionLoop));
-            CheckPositionThread.Start();
+            CheckPositionCancellation = new CancellationTokenSource();
+
+            CheckPositionThread = new Thread(new ParameterizedThreadStart(CheckPositionLoop));
+            CheckPositionThread.IsBackground = true;
+            CheckPositionThread.Start(CheckPositionCancellation.Token);
         }
 
         private void Stop()
         {
+            if (CheckPositionCancellation == null)
+                return;
+
+            CheckPositionCancellation.Cancel();
+
+            //the loop wakes up at least every 80ms, so this returns quickly
             if (CheckPositionThread != null)
-                CheckPositionThread.Abort();
+                CheckPositionThread.Join(TimeSpan.FromSeconds(1));
+
+            CheckPositionCancellation.Dispose();
+            CheckPositionCancellation = null;
+            CheckPositionThread = null;
         }
 
         public int Size = 10;
@@ -93,8 +105,8 @@ namespace WinLaunch
 
         ~HotCorner()
         {
-            if (CheckPositionThread != null)
-                CheckPositionThread.Abort();
+            if (CheckPositionCancellation != null)
+                CheckPositionCancellation.Cancel();
         }
 
         public void SetCorners(Corners corner)
@@ -167,11 +179,14 @@ namespace WinLaunch
         private bool WasInCorner = false;
 
         private Thread CheckPositionThread = null;
+        private CancellationTokenSource CheckPositionCancellation = null;
 
-        private void CheckPositionLoop()
+        private void CheckPositionLoop(object state)
         {
+            CancellationToken token = (CancellationToken)state;
+
             System.Drawing.Point MousePos = new System.Drawing.Point();
-            while (true)
+            while (!token.IsCancellationRequested)
             {
                 GetCursorPos(ref MousePos);
 
@@ -219,7 +234,7 @@ namespace WinLaunch
                     }
                 }
 
-                Thread.Sleep(80);
+                token.WaitHandle.WaitOne(80);
             }
         }
 

@@ -272,14 +272,14 @@ namespace WinLaunch
                 }
                 catch { }
 
-                using (FileStream fs = new FileStream(PortabilityManager.SettingsPath, FileMode.Create))
+                AtomicFile.Write(PortabilityManager.SettingsPath, fs =>
                 {
                     using (XmlWriter write = XmlWriter.Create(fs))
                     {
                         XmlSerializer ser = new XmlSerializer(typeof(Settings));
                         ser.Serialize(write, config);
                     }
-                }
+                });
 
                 return true;
             }

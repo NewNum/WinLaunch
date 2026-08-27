@@ -138,12 +138,20 @@ namespace WinLaunch
         {
             if (_hookID != IntPtr.Zero)
             {
-                bool success = UnhookWindowsHookEx(_hookID);
+                UnhookWindowsHookEx(_hookID);
+                _hookID = IntPtr.Zero;
+            }
 
-                if (hookThread != null)
-                {
-                    hookThread.Abort();
-                }
+            if (hookThread != null)
+            {
+                //ask the message pump to exit instead of killing the thread
+                if (hookThreadId != 0)
+                    PostThreadMessage(hookThreadId, WM_QUIT, IntPtr.Zero, IntPtr.Zero);
+
+                hookThread.Join(TimeSpan.FromSeconds(1));
+
+                hookThread = null;
+                hookThreadId = 0;
             }
         }
 
@@ -157,11 +165,22 @@ namespace WinLaunch
 
         #region private methods
         Thread hookThread;
+        uint hookThreadId;
+
+        private const uint WM_QUIT = 0x0012;
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool PostThreadMessage(uint idThread, uint Msg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("kernel32.dll")]
+        private static extern uint GetCurrentThreadId();
 
         private void SetHook(LowLevelMouseProc proc)
         {
             hookThread = new Thread(new ThreadStart(() =>
             {
+                hookThreadId = GetCurrentThreadId();
+
                 try
                 {
                     using (Process curProcess = Process.GetCurrentProcess())
@@ -186,6 +205,7 @@ namespace WinLaunch
                 }
             }));
 
+            hookThread.IsBackground = true;
             hookThread.Start();
         }
 

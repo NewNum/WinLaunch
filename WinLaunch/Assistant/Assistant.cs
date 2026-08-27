@@ -167,14 +167,23 @@ namespace WinLaunch
 
             if (Settings.CurrentSettings.AssistantPassword != null)
             {
-                try
+                password = CredentialProtector.Unprotect(Settings.CurrentSettings.AssistantPassword);
+
+                if (password == null)
                 {
-                    password = EncryptionUtils.AesOperation.DecryptString(PasswordEncryptionKey, Settings.CurrentSettings.AssistantPassword);
-                }
-                catch
-                {
-                    TransitionAssistantState(AssistantState.Login);
-                    return;
+                    //credential still uses the old shared-key encryption, migrate it to DPAPI
+                    try
+                    {
+                        password = EncryptionUtils.AesOperation.DecryptString(PasswordEncryptionKey, Settings.CurrentSettings.AssistantPassword);
+                    }
+                    catch
+                    {
+                        TransitionAssistantState(AssistantState.Login);
+                        return;
+                    }
+
+                    Settings.CurrentSettings.AssistantPassword = CredentialProtector.Protect(password);
+                    Settings.SaveSettings(Settings.CurrentSettings);
                 }
             }
 
@@ -514,11 +523,8 @@ namespace WinLaunch
                 return;
             }
 
-            //encrypt password
-            password = EncryptionUtils.AesOperation.EncryptString(PasswordEncryptionKey, password);
-
             Settings.CurrentSettings.AssistantUsername = username;
-            Settings.CurrentSettings.AssistantPassword = password;
+            Settings.CurrentSettings.AssistantPassword = CredentialProtector.Protect(password);
 
             Settings.SaveSettings(Settings.CurrentSettings);
 

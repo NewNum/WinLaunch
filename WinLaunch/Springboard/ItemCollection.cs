@@ -32,14 +32,14 @@ namespace WinLaunch
                 List<ICItem> ICItems = new List<ICItem>();
                 TranslateToSerializableFormat(ICItems);
 
-                using (FileStream fs = new FileStream(path, FileMode.Create))
+                AtomicFile.Write(path, fs =>
                 {
                     using (XmlWriter write = XmlWriter.Create(fs))
                     {
                         XmlSerializer ser = new XmlSerializer(typeof(List<ICItem>));
                         ser.Serialize(write, ICItems);
                     }
-                }
+                });
             }
             catch (Exception e)
             {

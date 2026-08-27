@@ -14,12 +14,13 @@ namespace WinLaunch
     {
         public static Window windowRef;
         private static Thread CheckThread;
+        private static CancellationTokenSource CheckCancellation;
         private static volatile bool running = false;
 
         public static void AbortCheckThread()
         {
-            if(CheckThread != null)
-                CheckThread.Abort();
+            if (CheckCancellation != null)
+                CheckCancellation.Cancel();
         }
 
         public static void RunThreaded()
@@ -29,9 +30,14 @@ namespace WinLaunch
                 return;
             }
 
+            AbortCheckThread();
+
+            CheckCancellation = new CancellationTokenSource();
+            CancellationToken token = CheckCancellation.Token;
+
             CheckThread = new Thread(new ThreadStart(() =>
             {
-                while (true)
+                while (!token.IsCancellationRequested)
                 {
                     try
                     {
@@ -47,10 +53,11 @@ namespace WinLaunch
                         }
                     }
                     catch { }
-                    Thread.Sleep(TimeSpan.FromHours(1));
+                    token.WaitHandle.WaitOne(TimeSpan.FromHours(1));
                 }
             }));
 
+            CheckThread.IsBackground = true;
             CheckThread.Start();
         }
 

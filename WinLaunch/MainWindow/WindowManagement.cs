@@ -442,6 +442,7 @@ namespace WinLaunch
         IntPtr OriginalParentWindow;
 
         Thread KeepWindowVisibleThread;
+        CancellationTokenSource KeepWindowVisibleCancellation;
 
         DispatcherTimer UpdateDeskModeRectTimer;
 
@@ -453,17 +454,35 @@ namespace WinLaunch
         [DllImport("user32.dll")]
         private static extern bool EnumWindows(EnumWindowsProc enumProc, IntPtr lParam);
 
+        private void StopKeepWindowVisibleThread()
+        {
+            if (KeepWindowVisibleCancellation == null)
+                return;
+
+            KeepWindowVisibleCancellation.Cancel();
+
+            //the loop wakes up every ~16ms, so this returns quickly
+            if (KeepWindowVisibleThread != null)
+                KeepWindowVisibleThread.Join(TimeSpan.FromSeconds(1));
+
+            KeepWindowVisibleCancellation.Dispose();
+            KeepWindowVisibleCancellation = null;
+            KeepWindowVisibleThread = null;
+        }
+
         private void StartKeepWindowVisibleThread()
         {
-            if (KeepWindowVisibleThread != null)
-                KeepWindowVisibleThread.Abort();
+            StopKeepWindowVisibleThread();
 
             if (UpdateDeskModeRectTimer != null)
                 UpdateDeskModeRectTimer.Stop();
 
+            KeepWindowVisibleCancellation = new CancellationTokenSource();
+            CancellationToken token = KeepWindowVisibleCancellation.Token;
+
             KeepWindowVisibleThread = new Thread(new ThreadStart(new Action(() =>
             {
-                while (IsDesktopChild)
+                while (IsDesktopChild && !token.IsCancellationRequested)
                 {
                     IntPtr window = WindowFromPoint(topLeftCorner);
 
@@ -489,10 +508,11 @@ namespace WinLaunch
                     }
 
                     //60 fps check
-                    Thread.Sleep(1000 / 60);
+                    token.WaitHandle.WaitOne(1000 / 60);
                 }
             })));
 
+            KeepWindowVisibleThread.IsBackground = true;
             KeepWindowVisibleThread.Start();
 
             UpdateDeskModeRectTimer = new DispatcherTimer();
@@ -566,8 +586,7 @@ namespace WinLaunch
             }
             else
             {
-                if (KeepWindowVisibleThread != null)
-                    KeepWindowVisibleThread.Abort();
+                StopKeepWindowVisibleThread();
 
                 IsDesktopChild = true;
 
@@ -591,8 +610,7 @@ namespace WinLaunch
             }
             else
             {
-                if (KeepWindowVisibleThread != null)
-                    KeepWindowVisibleThread.Abort();
+                StopKeepWindowVisibleThread();
 
                 IsDesktopChild = false;
             }
@@ -638,8 +656,7 @@ namespace WinLaunch
                         Rect FullScreenRect = GetDeskModeRect();
 
                         //stop the keep window thread until we are repositioned
-                        if (KeepWindowVisibleThread != null)
-                            KeepWindowVisibleThread.Abort();
+                        StopKeepWindowVisibleThread();
 
                         topLeftCorner = new System.Drawing.Point((int)FullScreenRect.X, (int)FullScreenRect.Y);
 
