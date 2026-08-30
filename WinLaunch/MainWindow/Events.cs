@@ -326,7 +326,7 @@ namespace WinLaunch
 
                                     Process.Start(startInfo);
                                 }
-                                catch (Exception ex) { }
+                                catch (Exception) { }
                             })).Start();
                         }
                     }

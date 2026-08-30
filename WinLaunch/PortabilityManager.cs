@@ -103,7 +103,7 @@ namespace WinLaunch
             {
                 Directory.Delete(PortableDirectory, true);
             }
-            catch(Exception ex)
+            catch (Exception)
             {
                 MessageBox.Show("Error while removing portable directory " + Path.GetFullPath(PortableDirectory) + " please delete it manually");
             }

@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Windows;
 
 // Allgemeine Informationen über eine Assembly werden über die folgenden
@@ -18,6 +19,7 @@ using System.Windows;
 // für COM-Komponenten. Wenn Sie auf einen Typ in dieser Assembly von
 // COM zugreifen müssen, legen Sie das ComVisible-Attribut für diesen Typ auf "true" fest.
 [assembly: ComVisible(false)]
+[assembly: SupportedOSPlatform("windows")]
 
 //Um mit dem Erstellen lokalisierbarer Anwendungen zu beginnen, legen Sie
 //<UICulture>ImCodeVerwendeteKultur</UICulture> in der .csproj-Datei
@@ -46,5 +48,5 @@ using System.Windows;
 // Sie können alle Werte angeben oder die standardmäßigen Build- und Revisionsnummern
 // übernehmen, indem Sie "*" eingeben:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.7.4.1")]
-[assembly: AssemblyFileVersion("0.7.4.1")]
+[assembly: AssemblyVersion("0.7.4.2")]
+[assembly: AssemblyFileVersion("0.7.4.2")]

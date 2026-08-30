@@ -15,8 +15,6 @@ namespace WinLaunch
             ToggleToolbar();
         }
 
-        private bool EditExtensionActive = false;
-
         private void RunEditExtension(SBItem Item)
         {
             //disable hotkey

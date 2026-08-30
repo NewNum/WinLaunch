@@ -19,7 +19,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <LangVersion>latest</LangVersion>
     <SatelliteResourceLanguages>bg-BG;da-DK;de-DE;en-US;es-ES;fr-FR;he-IL;hu-HU;id-ID;it-IT;ja-JP;pl-PL;pt-BR;ru-RU;tr-TR;uk-UA;zh-CN;zh-TW</SatelliteResourceLanguages>
-    <NoWarn>$(NoWarn);SYSLIB0014</NoWarn>
+    <NoWarn>$(NoWarn);SYSLIB0014;NU1701;NU1510</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,7 +31,6 @@
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="SocketIOClient" Version="3.1.2" />
-    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.0" />
     <PackageReference Include="System.Speech" Version="10.0.0" />
   </ItemGroup>
 

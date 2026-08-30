@@ -331,17 +331,6 @@
                     </MenuItem.Icon>
                 </MenuItem>
 
-                <Separator />
-
-                <MenuItem Click="miTutorialClicked" Header="{my:Loc Tutorial}">
-                    <MenuItem.Icon>
-                        <Image
-                            Margin="2,0"
-                            RenderOptions.BitmapScalingMode="HighQuality"
-                            Source="res/context/tutorial.png" />
-                    </MenuItem.Icon>
-                </MenuItem>
-
             </ContextMenu>
         </Grid.ContextMenu>
 
@@ -1896,7 +1885,7 @@
                 </Grid>
 
                 <!--  Item grid  -->
-                <Grid>
+                <Grid Visibility="Collapsed">
                     <!--  Background grid  -->
                     <Grid
                         MouseDown="miTutorialClicked"
@@ -2176,7 +2165,7 @@
                     RenderOptions.BitmapScalingMode="HighQuality"
                     Source="res/assistant/assistant.png"
                     ToolTip="{my:Loc AssistantName}"
-                    Visibility="{Binding Path=settings.AssistantIconVisible, Converter={StaticResource BoolToVis}}" />
+                    Visibility="Collapsed" />
             </StackPanel>
 
             <Image x:Name="imHideAssistantWindow"

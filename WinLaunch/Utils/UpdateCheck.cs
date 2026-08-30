@@ -106,10 +106,10 @@ namespace WinLaunch
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 running = false;
-                throw e;
+                throw;
             }
 
             Version version = Assembly.GetExecutingAssembly().GetName().Version;

@@ -25,8 +25,6 @@ namespace WinLaunch
             //show the welcome dialog if version is new
             if (Assembly.GetExecutingAssembly().GetName().Version > Settings.CurrentSettings.version)
             {
-                JustUpdated = true;
-
                 if (Settings.CurrentSettings.version == new Version("0.0.0.0"))
                 {
                     FirstLaunch = true;

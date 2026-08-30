@@ -234,7 +234,6 @@ namespace WinLaunch
         }
         #endregion
 
-        private bool IsFullscreen = true;
         private bool IsHidden = false;
 
         private double GetOptimalResolutionSettings(double Width, double Height)
@@ -694,7 +693,6 @@ namespace WinLaunch
                 );
 
             this.ResizeMode = System.Windows.ResizeMode.NoResize;
-            IsFullscreen = true;
 
             if (!Settings.CurrentSettings.DeskMode)
             {
@@ -721,8 +719,6 @@ namespace WinLaunch
                 CenterRect.Width,
                 CenterRect.Height,
                 0.5);
-
-            IsFullscreen = false;
         }
 
         private async void RevealWindow()

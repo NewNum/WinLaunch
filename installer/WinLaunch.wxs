@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product
+    Id="*"
+    Name="WinLaunch"
+    Language="1033"
+    Version="$(var.ProductVersion)"
+    Manufacturer="WinLaunch"
+    UpgradeCode="A7C4E2F1-8B3D-4A9E-9F6C-1D2E3F4A5B6C">
+    <Package
+      InstallerVersion="500"
+      Compressed="yes"
+      InstallScope="perUser"
+      Platform="x64"
+      Description="WinLaunch setup"
+      Comments="https://github.com/NewNum/WinLaunch" />
+    <MajorUpgrade DowngradeErrorMessage="A newer version of WinLaunch is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+    <Feature Id="MainFeature" Title="WinLaunch" Level="1">
+      <ComponentGroupRef Id="PublishFiles" />
+    </Feature>
+    <UIRef Id="WixUI_Minimal" />
+    <Property Id="WIXUI_INSTALLDIR" Value="APPINSTALL" />
+  </Product>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="LocalAppDataFolder">
+        <Directory Id="ProgramsFolder" Name="Programs">
+          <Directory Id="APPINSTALL" Name="WinLaunch" />
+        </Directory>
+      </Directory>
+    </Directory>
+  </Fragment>
+</Wix>

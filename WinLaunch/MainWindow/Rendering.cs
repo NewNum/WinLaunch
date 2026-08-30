@@ -273,8 +273,6 @@ namespace WinLaunch
                 if (BottomPos < PointerHeight)
                     BottomPos = PointerHeight;
 
-                double PathXClip = 100;
-
                 //FolderShapePath.StartPoint = new Point(-PathXClip, PointerHeight);
 
                 ////Top Pointer

@@ -22,6 +22,7 @@ dotnet test WinLaunch.Tests\WinLaunch.Tests.csproj -c Release
 
 - 可执行文件：`WinLaunch\bin\Release\net10.0-windows\WinLaunch.exe`
 - CI：`.github/workflows/build.yml`（`windows-latest`，`dotnet-version: 10.0.x`）
+- Release：推送 `v*` tag 触发 `.github/workflows/release.yml`，产出 exe / msi / zip 及 release-notes（含 MD5）
 - 运行前若已有实例，需先结束 `WinLaunch` 进程，否则 exe 会被锁定导致构建失败
 - 默认单实例：再次启动会激活已有实例并退出；调试时可用 `WM_TOGGLELAUNCHPAD`（`0x8808`）或快捷键唤起面板
 

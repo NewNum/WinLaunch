@@ -507,7 +507,7 @@ namespace WinLaunch
                 }
                 ret = true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 ret = false;
             }
@@ -606,9 +606,9 @@ namespace WinLaunch
                 encoder.Save(stream);
                 stream.Close();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                throw e;
+                throw;
             }
         }
 
@@ -620,12 +620,11 @@ namespace WinLaunch
             try
             {
                 MemoryStream ms = new MemoryStream();
-                FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read);
-                ms.SetLength(stream.Length);
-                stream.Read(ms.GetBuffer(), 0, (int)stream.Length);
-
-                ms.Flush();
-                stream.Close();
+                using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read))
+                {
+                    ms.SetLength(stream.Length);
+                    stream.CopyTo(ms);
+                }
 
                 BitmapImage src = new BitmapImage();
                 src.BeginInit();
@@ -643,9 +642,9 @@ namespace WinLaunch
 
                 return DecoupleBitmap(src);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -852,7 +851,14 @@ namespace WinLaunch
         public static string GetLionFormattedText(string text, FontFamily font, double size, double MaxWidth)
         {
             string formattedText = text;
-            FormattedText fmt = new FormattedText(formattedText, new System.Globalization.CultureInfo("en"), System.Windows.FlowDirection.LeftToRight, new Typeface(font.ToString()), size, Brushes.White);
+            FormattedText fmt = new FormattedText(
+                formattedText,
+                new System.Globalization.CultureInfo("en"),
+                System.Windows.FlowDirection.LeftToRight,
+                new Typeface(font.ToString()),
+                size,
+                Brushes.White,
+                1.0);
             fmt.MaxLineCount = 1;
             int removedchars = 2;
 
@@ -867,7 +873,14 @@ namespace WinLaunch
                 if (formattedText == "...")
                     return "";
 
-                fmt = new FormattedText(formattedText, new System.Globalization.CultureInfo("en"), System.Windows.FlowDirection.LeftToRight, new Typeface(font.ToString()), size, Brushes.White);
+                fmt = new FormattedText(
+                    formattedText,
+                    new System.Globalization.CultureInfo("en"),
+                    System.Windows.FlowDirection.LeftToRight,
+                    new Typeface(font.ToString()),
+                    size,
+                    Brushes.White,
+                    1.0);
                 fmt.MaxLineCount = 1;
             }
 
@@ -1046,7 +1059,7 @@ namespace WinLaunch
 
                 return ret;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -1059,27 +1072,6 @@ namespace WinLaunch
 
         public static void WriteToLogFile(string logMessage)
         {
-            return;
-
-            string strLogMessage = string.Empty;
-            string strLogFile = LogFile;
-            StreamWriter swLog;
-
-            strLogMessage = string.Format("{0}: {1}", DateTime.Now.ToString("G"), logMessage);
-
-            if (!System.IO.File.Exists(strLogFile))
-            {
-                swLog = new StreamWriter(strLogFile);
-            }
-            else
-            {
-                swLog = System.IO.File.AppendText(strLogFile);
-            }
-
-            swLog.WriteLine(strLogMessage);
-            swLog.WriteLine();
-
-            swLog.Close();
         }
     }
 

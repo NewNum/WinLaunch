@@ -45,6 +45,7 @@ namespace WinLaunch
             public string szTypeName;
         };
 
+#pragma warning disable CS0649 // interop layout; native code fills these fields
         private struct IMAGELISTDRAWPARAMS
         {
             public int cbSize;
@@ -65,6 +66,7 @@ namespace WinLaunch
             public int Frame;
             public int crEffect;
         }
+#pragma warning restore CS0649
 
         [StructLayout(LayoutKind.Sequential)]
         public struct RECT

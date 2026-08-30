@@ -20,7 +20,6 @@ namespace WinLaunch
         public event PropertyChangedEventHandler PropertyChanged;
 
         bool FirstLaunch = false;
-        bool JustUpdated = false;
 
         #region Interop
 

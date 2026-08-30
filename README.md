@@ -70,10 +70,57 @@ dotnet build -c Release
 
 若要以便携方式运行，在可执行文件同级目录创建 `Data` 文件夹即可。
 
+### 制作安装包
+
+需要 [Inno Setup 6](https://jrsoftware.org/isinfo.php)（可用 `winget install JRSoftware.InnoSetup` 安装）。
+
+```powershell
+.\installer\build-installer.ps1
+```
+
+默认生成**自包含**安装包（内置 .NET 10 运行时，用户无需单独安装），输出：
+
+`installer\output\WinLaunch-Setup-0.7.4.2.exe`
+
+若要生成更小的安装包（依赖本机已安装 .NET 10 桌面运行时）：
+
+```powershell
+.\installer\build-installer.ps1 -FrameworkDependent
+```
+
 运行单元测试：
 
 ```powershell
 dotnet test WinLaunch.Tests\WinLaunch.Tests.csproj
+```
+
+### 发布 GitHub Release
+
+推送 `v*` 标签后会自动构建并发布（`.github/workflows/release.yml`）：
+
+1. 在 `WinLaunch/Properties/AssemblyInfo.cs` 更新版本号（须与 tag 一致）
+2. 提交并推送代码
+3. 打 tag 并推送：
+
+```powershell
+git tag v0.7.4.2
+git push origin v0.7.4.2
+```
+
+Release 附件包含：
+
+| 文件 | 说明 |
+| --- | --- |
+| `WinLaunch-Setup-{version}.exe` | Inno Setup 自包含安装包 |
+| `WinLaunch-{version}.msi` | WiX MSI 自包含安装包 |
+| `WinLaunch-{version}-portable.zip` | 便携版（含 `Data` 目录） |
+
+Release 说明会自动生成：自上个 tag 到当前 tag 的提交摘要、.NET 10 运行时说明，以及三个文件的 MD5 校验和。
+
+本地完整预演（需 Inno Setup 6 + WiX Toolset 3）：
+
+```powershell
+.\installer\build-release.ps1 -Version 0.7.4.2
 ```
 
 ## 目录结构

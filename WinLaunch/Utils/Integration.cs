@@ -273,7 +273,7 @@ namespace WinLaunch
             hWnd = GetForegroundWindow();
 
             //check if we have a valid handle and din't pick ourself
-            if (hWnd != null && hWnd != (new WindowInteropHelper(window).Handle))
+            if (hWnd != IntPtr.Zero && hWnd != (new WindowInteropHelper(window).Handle))
             {
                 //check if the window is a WorkerW (e.g. ShowDesktop layer window)
                 StringBuilder classname = new StringBuilder(256);

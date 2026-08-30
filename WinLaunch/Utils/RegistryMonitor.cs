@@ -347,16 +347,28 @@ namespace RegistryUtils
             {
                 AutoResetEvent _eventNotify = new AutoResetEvent(false);
                 WaitHandle[] waitHandles = new WaitHandle[] { _eventNotify, _eventTerminate };
-                while (!_eventTerminate.WaitOne(0, true))
-                {
-                    result = RegNotifyChangeKeyValue(registryKey, true, _regFilter, _eventNotify.Handle, true);
-                    if (result != 0)
-                        throw new Win32Exception(result);
+                bool eventAddedRef = false;
+                _eventNotify.SafeWaitHandle.DangerousAddRef(ref eventAddedRef);
+                IntPtr eventHandle = _eventNotify.SafeWaitHandle.DangerousGetHandle();
 
-                    if (WaitHandle.WaitAny(waitHandles) == 0)
+                try
+                {
+                    while (!_eventTerminate.WaitOne(0, true))
                     {
-                        OnRegChanged();
+                        result = RegNotifyChangeKeyValue(registryKey, true, _regFilter, eventHandle, true);
+                        if (result != 0)
+                            throw new Win32Exception(result);
+
+                        if (WaitHandle.WaitAny(waitHandles) == 0)
+                        {
+                            OnRegChanged();
+                        }
                     }
+                }
+                finally
+                {
+                    if (eventAddedRef)
+                        _eventNotify.SafeWaitHandle.DangerousRelease();
                 }
             }
             finally

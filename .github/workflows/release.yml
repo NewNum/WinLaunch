@@ -1,0 +1,72 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Resolve version from tag
+        id: version
+        shell: pwsh
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          if ($tag -notmatch '^v(.+)$') {
+            throw "Tag must look like v1.2.3.4, got: $tag"
+          }
+          "version=$($Matches[1])" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "tag=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Install Inno Setup
+        run: choco install innosetup -y
+
+      - name: Install WiX Toolset
+        run: |
+          choco install wixtoolset -y
+          $wixRoot = "${env:ProgramFiles(x86)}\WiX Toolset v3.14\bin"
+          if (-not (Test-Path $wixRoot)) {
+            $wixRoot = "${env:ProgramFiles(x86)}\WiX Toolset v3.11\bin"
+          }
+          "WIX=$wixRoot" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "$wixRoot" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+        shell: pwsh
+
+      - name: Build release artifacts
+        shell: pwsh
+        run: |
+          .\installer\build-release.ps1 `
+            -Version "${{ steps.version.outputs.version }}" `
+            -Tag "${{ steps.version.outputs.tag }}"
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          $version = "${{ steps.version.outputs.version }}"
+          $tag = "${{ steps.version.outputs.tag }}"
+          $output = "installer/output"
+
+          gh release create $tag `
+            "$output/WinLaunch-Setup-$version.exe" `
+            "$output/WinLaunch-$version.msi" `
+            "$output/WinLaunch-$version-portable.zip" `
+            --title "WinLaunch $version" `
+            --notes-file "$output/release-notes.md"

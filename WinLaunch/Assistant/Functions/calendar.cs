@@ -157,7 +157,7 @@ namespace WinLaunch
 
                     AssistantDelayClose = false;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     Debugger.Break();
                 }

@@ -303,7 +303,9 @@ __pycache__/
 # tools/**
 # !tools/packages.config
 
-# Tabs Studio
+installer/output/
+installer/obj/
+
 *.tss
 
 # Telerik's JustMock configuration file

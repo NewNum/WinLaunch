@@ -41,9 +41,9 @@ namespace WinLaunch
                     }
                 });
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                throw e;
+                throw;
             }
         }
 
@@ -68,7 +68,7 @@ namespace WinLaunch
 
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -180,7 +180,7 @@ namespace WinLaunch
                                 throw new Exception("error loading image");
                             }
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                             try
                             {

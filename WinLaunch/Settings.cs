@@ -185,7 +185,7 @@ namespace WinLaunch
             PageIndicatorsVisible = true;
 
             AssistantMemoryList = new List<AssistantMemoryItem>();
-            AssistantIconVisible = true;
+            AssistantIconVisible = false;
             AssistantTTS = false;
             ExecuteAssistantCommands = true;
             ExecuteAssistantPython = true;
