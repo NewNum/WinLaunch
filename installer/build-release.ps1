@@ -254,6 +254,79 @@ if (Test-Path $msiPath) {
     Remove-Item $msiPath -Force
 }
 
+function Build-MsiWithWix7 {
+    param(
+        [string]$WixExe,
+        [string]$PublishDir,
+        [string]$Version,
+        [string]$OutputPath,
+        [string]$ScriptRoot,
+        [string]$OutputDir
+    )
+
+    $packageWxs = Join-Path $ScriptRoot "WinLaunch.Package.wxs"
+    & $WixExe build `
+        -d "PublishDir=$PublishDir" `
+        -d "ProductVersion=$Version" `
+        $packageWxs `
+        -o $OutputPath
+    if ($LASTEXITCODE -ne 0) { throw "WiX build failed" }
+
+    Get-ChildItem $OutputDir -Filter "cab*.cab" -ErrorAction SilentlyContinue | Remove-Item -Force
+    Get-ChildItem $OutputDir -Filter "*.wixpdb" -ErrorAction SilentlyContinue | Remove-Item -Force
+    Write-Host "    Built with WiX CLI 7" -ForegroundColor Green
+}
+
+function Build-MsiWithWix3 {
+    param(
+        [string]$HeatExe,
+        [string]$CandleExe,
+        [string]$LightExe,
+        [string]$PublishDir,
+        [string]$Version,
+        [string]$OutputPath,
+        [string]$ScriptRoot,
+        [string]$ObjDir
+    )
+
+    $generatedWxs = Join-Path $ObjDir "GeneratedFiles.wxs"
+    if (Test-Path $generatedWxs) {
+        Remove-Item $generatedWxs -Force
+    }
+
+    & $HeatExe dir $PublishDir `
+        -cg PublishFiles `
+        -gg `
+        -sfrag `
+        -srd `
+        -dr APPINSTALL `
+        -var var.PublishDir `
+        -out $generatedWxs
+    if ($LASTEXITCODE -ne 0) { throw "WiX heat failed" }
+
+    $wxs = Join-Path $ScriptRoot "WinLaunch.wxs"
+    $candleOutDir = Join-Path $ObjDir ""
+    & $CandleExe -nologo `
+        -dPublishDir=$PublishDir `
+        -dProductVersion=$Version `
+        $wxs $generatedWxs `
+        -out $candleOutDir
+    if ($LASTEXITCODE -ne 0) { throw "WiX candle failed" }
+
+    & $LightExe -nologo `
+        -ext WixUIExtension `
+        (Join-Path $ObjDir "WinLaunch.wixobj") `
+        (Join-Path $ObjDir "GeneratedFiles.wixobj") `
+        -out $OutputPath
+    if ($LASTEXITCODE -ne 0) { throw "WiX light failed" }
+
+    Write-Host "    Built with WiX Toolset v3" -ForegroundColor Green
+}
+
+$wix = Find-Tool "wix.exe" @(
+    "$env:ProgramFiles\WiX Toolset v7.0\bin\wix.exe",
+    "$env:LOCALAPPDATA\Programs\WiX Toolset v7.0.0\bin\wix.exe"
+)
 $heat = Find-Tool "heat.exe" @(
     "${env:ProgramFiles(x86)}\WiX Toolset v3.14\bin\heat.exe",
     "${env:ProgramFiles(x86)}\WiX Toolset v3.11\bin\heat.exe",
@@ -271,62 +344,30 @@ $light = Find-Tool "light.exe" @(
 )
 
 $builtMsi = $false
-if ($heat -and $candle -and $light) {
-    $generatedWxs = Join-Path $objDir "GeneratedFiles.wxs"
-    if (Test-Path $generatedWxs) {
-        Remove-Item $generatedWxs -Force
-    }
-
-    & $heat dir $publishDir `
-        -cg PublishFiles `
-        -gg `
-        -sfrag `
-        -srd `
-        -dr APPINSTALL `
-        -var var.PublishDir `
-        -out $generatedWxs
-    if ($LASTEXITCODE -ne 0) { throw "WiX heat failed" }
-
-    $wxs = Join-Path $PSScriptRoot "WinLaunch.wxs"
-    & $candle -nologo `
-        -dPublishDir=$publishDir `
-        -dProductVersion=$Version `
-        $wxs $generatedWxs `
-        -out $objDir
-    if ($LASTEXITCODE -ne 0) { throw "WiX candle failed" }
-
-    & $light -nologo `
-        -ext WixUIExtension `
-        (Join-Path $objDir "WinLaunch.wixobj") `
-        (Join-Path $objDir "GeneratedFiles.wixobj") `
-        -out $msiPath
-    if ($LASTEXITCODE -ne 0) { throw "WiX light failed" }
-
+if ($wix) {
+    Build-MsiWithWix7 `
+        -WixExe $wix `
+        -PublishDir $publishDir `
+        -Version $Version `
+        -OutputPath $msiPath `
+        -ScriptRoot $PSScriptRoot `
+        -OutputDir $outputDir
     $builtMsi = $true
-    Write-Host "    Built with WiX Toolset v3" -ForegroundColor Green
+}
+elseif ($heat -and $candle -and $light) {
+    Build-MsiWithWix3 `
+        -HeatExe $heat `
+        -CandleExe $candle `
+        -LightExe $light `
+        -PublishDir $publishDir `
+        -Version $Version `
+        -OutputPath $msiPath `
+        -ScriptRoot $PSScriptRoot `
+        -ObjDir $objDir
+    $builtMsi = $true
 }
 else {
-    $wix = Find-Tool "wix.exe" @(
-        "$env:ProgramFiles\WiX Toolset v7.0\bin\wix.exe",
-        "$env:LOCALAPPDATA\Programs\WiX Toolset v7.0.0\bin\wix.exe"
-    )
-    if (-not $wix) {
-        throw "No WiX toolset found. Install WiX v3 (choco install wixtoolset) or WiX CLI 7 (winget install WiXToolset.WiXCLI)."
-    }
-
-    $packageWxs = Join-Path $PSScriptRoot "WinLaunch.Package.wxs"
-    & $wix build `
-        -d "PublishDir=$publishDir" `
-        -d "ProductVersion=$Version" `
-        $packageWxs `
-        -o $msiPath
-    if ($LASTEXITCODE -ne 0) { throw "WiX build failed" }
-
-    Get-ChildItem $outputDir -Filter "cab*.cab" -ErrorAction SilentlyContinue | Remove-Item -Force
-    Get-ChildItem $outputDir -Filter "*.wixpdb" -ErrorAction SilentlyContinue | Remove-Item -Force
-
-    $builtMsi = $true
-    Write-Host "    Built with WiX CLI 7" -ForegroundColor Green
+    throw "No WiX toolset found. Install WiX CLI 7 (winget install WiXToolset.WiXCLI) or WiX v3 (choco install wixtoolset)."
 }
 
 if (-not $builtMsi -or -not (Test-Path $msiPath)) {
