@@ -77,7 +77,7 @@ function Get-PreviousTag {
     }
 }
 
-function Get-ReleaseChangelog {
+function Get-CommitSubjects {
     param(
         [string]$CurrentTag,
         [string]$PreviousTag
@@ -86,24 +86,125 @@ function Get-ReleaseChangelog {
     Push-Location $repoRoot
     try {
         if ($PreviousTag) {
-            $header = "Changes since $PreviousTag"
-            $commits = @(git log "$PreviousTag..$CurrentTag" --pretty=format:"- %s (%h)" --no-merges 2>$null)
-            if ($commits.Count -eq 0) {
-                $commits = @(git log "$PreviousTag..HEAD" --pretty=format:"- %s (%h)" --no-merges 2>$null)
+            $subjects = @(git log "$PreviousTag..$CurrentTag" --pretty=format:%s --no-merges 2>$null)
+            if ($subjects.Count -eq 0) {
+                $subjects = @(git log "$PreviousTag..HEAD" --pretty=format:%s --no-merges 2>$null)
             }
         }
         else {
-            $header = "All changes in this release"
-            $commits = @(git log --pretty=format:"- %s (%h)" --no-merges 2>$null)
+            $subjects = @(git log --pretty=format:%s --no-merges 2>$null)
         }
 
-        return @{
-            Header  = $header
-            Commits = $commits
-        }
+        return $subjects
     }
     finally {
         Pop-Location
+    }
+}
+
+function Get-SignificantCommitSubjects {
+    param([string[]]$Subjects)
+
+    $noisePatterns = @(
+        '^(update|updated)\s',
+        '^cleanup$',
+        '^Cleanup',
+        '^fix$',
+        '^small fix',
+        '^formatting$',
+        '^rename ',
+        '^revert ',
+        '^remove log$',
+        '^test case',
+        'UI fix',
+        '^bugfix$',
+        '^some fixes$',
+        '^fixes$'
+    )
+
+    $significant = [System.Collections.Generic.List[string]]::new()
+    foreach ($subject in $Subjects) {
+        $skip = $false
+        foreach ($pattern in $noisePatterns) {
+            if ($subject -match $pattern) {
+                $skip = $true
+                break
+            }
+        }
+
+        if (-not $skip) {
+            $significant.Add($subject)
+        }
+    }
+
+    return @($significant)
+}
+
+function Get-ReleaseSummary {
+    param(
+        [string[]]$Subjects,
+        [int]$MaxBullets = 12
+    )
+
+    $text = ($Subjects -join "`n").ToLowerInvariant()
+    $themeRules = @(
+        @{ Pattern = 'migrate|.net 10|net10|framework 4\.8|sdk-style|comutils|com reference'; Summary = 'Migrated the project from .NET Framework 4.8 to .NET 10 (SDK-style, x64).' }
+        @{ Pattern = 'chinese|translation|zh-cn|zh-tw|language picker|traditional chinese|simplified chinese'; Summary = 'Improved localization, including Simplified and Traditional Chinese.' }
+        @{ Pattern = 'shortcut|identity|dedup|scanner|installed app|app list|start menu|sync|watcher'; Summary = 'Improved app list sync, shortcut identity deduplication, and automatic add/remove.' }
+        @{ Pattern = 'release|installer|workflow|wix|inno|build-release|github release'; Summary = 'Added automated GitHub Releases and Windows installers (exe, msi, portable zip).' }
+        @{ Pattern = 'hide|tutorial|assistant icon|login'; Summary = 'Hid the assistant login entry and tutorial shortcuts in the UI.' }
+        @{ Pattern = 'warning|supportedosplatform|ca1416|nowarn'; Summary = 'Eliminated .NET 10 build warnings and cleaned up project settings.' }
+        @{ Pattern = 'crash|credential|data loss|atomic|portability|encryption'; Summary = 'Fixed post-migration stability, data safety, and credential storage issues.' }
+        @{ Pattern = 'agents\.md'; Summary = 'Added AGENTS.md with build and architecture guidance for coding agents.' }
+        @{ Pattern = 'readme'; Summary = 'Updated user-facing documentation.' }
+        @{ Pattern = 'assistant|gmail|calendar|python|socket|tts|voice'; Summary = 'Extended the optional AI assistant and related integrations.' }
+        @{ Pattern = 'test|xunit'; Summary = 'Added and expanded unit tests for shared utilities and app identity logic.' }
+        @{ Pattern = 'desk mode|gamepad|hotcorner|activation|windows key'; Summary = 'Refined launchpad activation methods and desk mode behavior.' }
+    )
+
+    $bullets = [System.Collections.Generic.List[string]]::new()
+    foreach ($rule in $themeRules) {
+        if ($text -match $rule.Pattern) {
+            $bullets.Add($rule.Summary)
+        }
+    }
+
+    if ($Subjects.Count -le 15) {
+        $significant = Get-SignificantCommitSubjects -Subjects $Subjects
+        $priority = $significant | Where-Object { $_ -match '^(Add|Fix|Migrate|Implement|Identify|Ship|Hide|Complete|Rewrite|Create|Introduce|Pin|Trim)' }
+        $rest = $significant | Where-Object { $_ -notmatch '^(Add|Fix|Migrate|Implement|Identify|Ship|Hide|Complete|Rewrite|Create|Introduce|Pin|Trim)' }
+        foreach ($subject in (@($priority) + @($rest) | Select-Object -Unique)) {
+            if ($bullets.Count -ge $MaxBullets) { break }
+            if ($bullets -notcontains $subject) {
+                $bullets.Add($subject)
+            }
+        }
+    }
+
+    if ($bullets.Count -eq 0) {
+        foreach ($subject in (Get-SignificantCommitSubjects -Subjects $Subjects | Select-Object -First $MaxBullets)) {
+            $bullets.Add($subject)
+        }
+    }
+
+    return @($bullets | Select-Object -Unique -First $MaxBullets)
+}
+
+function Get-ReleaseChangelog {
+    param(
+        [string]$CurrentTag,
+        [string]$PreviousTag
+    )
+
+    $subjects = Get-CommitSubjects -CurrentTag $CurrentTag -PreviousTag $PreviousTag
+    $header = if ($PreviousTag) { "Changes since $PreviousTag" } else { "Highlights in this release" }
+    $summary = Get-ReleaseSummary -Subjects $subjects
+
+    return @{
+        Header       = $header
+        Summary      = $summary
+        CommitCount  = $subjects.Count
+        PreviousTag  = $PreviousTag
     }
 }
 
@@ -112,17 +213,25 @@ function Write-ReleaseNotes {
         [string]$Version,
         [string]$Tag,
         [string]$PreviousTag,
-        [string[]]$Commits,
+        [string[]]$Summary,
+        [int]$CommitCount,
         [hashtable]$Checksums,
         [string]$OutputPath
     )
 
     $prevLine = if ($PreviousTag) { $PreviousTag } else { "(none — first tagged release)" }
-    $commitBlock = if ($Commits.Count -gt 0) {
-        ($Commits -join "`n")
+    $summaryBlock = if ($Summary.Count -gt 0) {
+        (($Summary | ForEach-Object { "- $_" }) -join "`n")
     }
     else {
-        "- No commit messages found in range."
+        "- No notable changes were detected in the commit range."
+    }
+
+    $rangeNote = if ($CommitCount -gt 0) {
+        "Summarized from $CommitCount commit(s) since $prevLine."
+    }
+    else {
+        "No commits were found in the selected range."
     }
 
     $notes = @"
@@ -144,9 +253,9 @@ This release targets **.NET 10** (net10.0-windows, x64). The project was migrate
 
 ### Changes
 
-Previous tag: $prevLine
+$rangeNote
 
-$commitBlock
+$summaryBlock
 
 ### MD5 checksums
 
@@ -388,7 +497,8 @@ Write-ReleaseNotes `
     -Version $Version `
     -Tag $Tag `
     -PreviousTag $previousTag `
-    -Commits $changelog.Commits `
+    -Summary $changelog.Summary `
+    -CommitCount $changelog.CommitCount `
     -Checksums $checksums `
     -OutputPath $notesPath
 
